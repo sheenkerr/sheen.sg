@@ -5,7 +5,7 @@ A static site built with HTML, CSS, and plain JavaScript. No build step is requi
 - `index.html`: page structure and entry point.
 - `css/styles.css`: all page styles, including themes and responsive layouts.
 - The inline script in the head of `index.html` applies the saved theme before the page draws, without a separate blocking request. Keep it synchronous and before the stylesheet.
-- `js/me.js`: profile, stories, projects, education, and skills data.
+- `js/me.js`: profile, stories, projects, education, and skills data. The CV, GitHub and LinkedIn links are written in `index.html` instead, where search engines read them without running scripts; the GitHub and LinkedIn addresses also appear in its structured data.
 - `js/toys.js`: interactive mini demos.
 - `js/logos.js`: shared logo lookup and markup helpers.
 - `js/app.js`: page rendering and interactions.

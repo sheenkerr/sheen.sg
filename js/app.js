@@ -6,7 +6,8 @@ function yearMonth(date) {
 }
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const GH = document.querySelector('.icon-link[aria-label="GitHub"] svg').outerHTML;
-document.querySelectorAll('.contact [data-icon]').forEach(a => a.insertAdjacentHTML('afterbegin', document.querySelector(`.icon-link[aria-label="${a.dataset.icon}"] svg`).outerHTML));
+// the links in "Find me online" borrow the icon of the top-bar link to the same place
+document.querySelectorAll('.contact a[href]').forEach(a => a.insertAdjacentHTML('afterbegin', document.querySelector(`.topbar a[href="${a.getAttribute('href')}"] svg`).outerHTML));
 const LINKEDIN = document.querySelector('.icon-link[aria-label="LinkedIn"] svg').outerHTML;
 const doneMark = '<svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="9" fill="currentColor"/><path d="M5 9.2l2.6 2.6L13 6.4" fill="none" style="stroke:var(--card)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 

@@ -274,5 +274,4 @@ window.ME = {
     'Frontend & Apps': { c: 'chip-c', items: ['React', 'React Native', 'Material UI', 'Vitest', 'JUnit', 'Figma'] },
     'Data Science & Automation': { c: null, items: ['PyTorch', 'TensorFlow', 'Tableau', 'UiPath'] },
   },
-  contact: { linkedin: 'https://www.linkedin.com/in/sheenkerr/', github: 'https://github.com/sheenkerr', cv_pdf: 'cv-sheen.pdf' },
 };
