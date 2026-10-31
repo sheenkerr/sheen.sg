@@ -1,0 +1,5 @@
+# Local notes and full-size source photos; not part of the site
+local/
+
+# Claude Code preview settings for this machine
+.claude/
