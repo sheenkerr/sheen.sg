@@ -17,7 +17,8 @@ document.querySelectorAll('.prod').forEach(el => el.insertAdjacentHTML('afterbeg
 
 // ---------- covers: a drawing of what the story is about, in its product's colours ----------
 const look = {
-  stripe: 'live', abuse: 'fourth', deploy: 'pipeline', data: 'json', llm: 'fallback', mentor: 'team', echelon: 'booth',
+  stripe: 'live', abuse: 'fourth', deploy: 'pipeline', data: 'json', formulas: 'formula', signup: 'background', access: 'authenticator',
+  llm: 'fallback', mentor: 'team', echelon: 'booth',
   peerprep: 'gateway', sqlancer: 'chart', orbital: 'focus', bizbook: 'table',
 };
 // every drawing keeps to one 224 × 150 frame (x 210–434, y 36–186) and fills it, so it's as big as the space allows
@@ -34,6 +35,12 @@ const DRAWINGS = {
   pipeline: `<circle cx="234" cy="114" r="13" ${ART_STROKE}/><path d="M212 114h9M247 114h9M262 114h22M278 108l6 6-6 6" ${ART_STROKE}/><rect x="292" y="92" width="48" height="44" rx="6" ${ART_STROKE}/><path d="M292 106h48" ${ART_STROKE}/><path d="M348 114h16M358 108l6 6-6 6" ${ART_STROKE}/><path d="M416.8 112h-3.28A20.8 20.8 0 1 0 393.4 138h23.4a13 13 0 0 0 0-26z" ${ART_STROKE}/><path d="M234 92C236 52 398 52 400 84M394 78l6 6 6-6" ${ART_STROKE} opacity=".55"/>`,
   // JSON blobs become tables
   json: `<path d="M244 58c-10 0-12 6-12 14v18c0 6-4 10-10 10 6 0 10 4 10 10v18c0 8 2 14 12 14M262 58c10 0 12 6 12 14v18c0 6 4 10 10 10-6 0-10 4-10 10v18c0 8-2 14-12 14" ${ART_STROKE}/><path d="M296 100h26M316 94l6 6-6 6" ${ART_STROKE}/><rect x="336" y="52" width="96" height="96" rx="8" ${ART_STROKE}/><path d="M336 76h96M336 100h96M336 124h96M368 52v96M400 52v96" ${ART_STROKE} opacity=".55"/>`,
+  // a formula, with the attributes it reads from linked to it, and the check that keeps those links valid
+  formula: `<rect x="222" y="54" width="112" height="60" rx="10" ${ART_STROKE}/><path d="M236 86h6l6 12 10-28h24M294 79h16M294 91h16" ${ART_STROKE}/><path d="M334 76c10 0 10-14 22-14M334 92c10 0 10 20 22 20" ${ART_STROKE} opacity=".55"/><rect x="356" y="50" width="76" height="26" rx="8" ${ART_STROKE}/><rect x="356" y="99" width="76" height="26" rx="8" ${ART_STROKE}/><rect x="356" y="148" width="76" height="26" rx="8" ${ART_STROKE} opacity=".55"/><circle cx="252" cy="152" r="18" ${ART_STROKE}/><path d="M243 152l6 6 12-13" ${ART_STROKE}/>`,
+  // the verification email goes straight through, and the demo catalogue loads in a queue behind it
+  background: `<rect x="222" y="58" width="94" height="64" rx="8" ${ART_STROKE}/><path d="M222 64l47 33 47-33" ${ART_STROKE}/><path d="M324 90h22M340 84l6 6-6 6" ${ART_STROKE}/><circle cx="380" cy="90" r="24" ${ART_STROKE}/><path d="M369 90l8 8 15-16" ${ART_STROKE}/><path d="M269 128c0 20 26 26 61 26" ${ART_STROKE} opacity=".55"/><rect x="338" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/><rect x="371" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/><rect x="404" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/>`,
+  // a shield for the sign-up domain rules, and an authenticator code counting down for the admin sign-in
+  authenticator: `<path d="M262 50l40 14v34c0 28-18 46-40 56-22-10-40-28-40-56V64z" ${ART_STROKE}/><path d="M246 100l11 11 22-24" ${ART_STROKE}/><path d="M310 102h36" ${ART_STROKE} opacity=".55"/><rect x="356" y="44" width="66" height="118" rx="12" ${ART_STROKE}/><path d="M381 56h16" ${ART_STROKE} opacity=".55"/><path d="M368 88h10M384 88h10M400 88h10" ${ART_STROKE}/><path d="M368 104h10M384 104h10M400 104h10" ${ART_STROKE} opacity=".55"/><circle cx="389" cy="134" r="11" ${ART_STROKE} opacity=".3"/><path d="M389 123a11 11 0 1 1-11 11" ${ART_STROKE}/>`,
   // a request goes to the chosen model, and falls back to the second when the first fails
   fallback: `<circle cx="230" cy="110" r="10" ${ART_STROKE}/><path d="M240 110h30" ${ART_STROKE}/><path d="M288 92l18 18-18 18-18-18z" ${ART_STROKE}/><path d="M306 110c22 0 20-36 44-36M306 110c22 0 20 36 44 36" ${ART_STROKE}/><rect x="352" y="56" width="80" height="36" rx="8" ${ART_STROKE}/><rect x="352" y="128" width="80" height="36" rx="8" ${ART_STROKE} opacity=".55"/><path d="M392 98v22M386 114l6 6 6-6" ${ART_STROKE} opacity=".55"/>`,
   // one person showing three new ones the ropes
@@ -93,12 +100,14 @@ const all = [...stories, ...projects];
 
 // the Stripe story always leads; it takes the big widget, with the guard beside it so
 // there's something to try straight away. The rest open with "Show all stories".
-const ORDER = ['stripe', 'abuse', 'deploy', 'data', 'llm', 'mentor', 'echelon'];
+const ORDER = ['stripe', 'abuse', 'deploy', 'data', 'formulas', 'signup', 'access', 'llm', 'mentor', 'echelon'];
 const pick = stories.find(x => x.id === 'stripe');
 // Most stories are Julia's, so in plain order its cream covers would sit side by side. On a wide screen the rest lay out
 // as two wide stories under the big story and the guard, then small ones four to a row, two under each wide one.
-// Every arrangement is tried (six stories, so 720 at most) and the one with the fewest matching covers wins: one side
-// by side counts ten, one under another counts one. Ties keep the order of how much they show.
+// Every arrangement of cover colours is tried and the one with the fewest matching covers wins: one side by side counts
+// ten, one under another counts one. Swapping two covers of the same colour changes nothing, so stories of one colour
+// keep their order and only the first of each colour is tried at each place (nine stories in four colours, so a few
+// hundred arrangements rather than 9!). Ties keep the order of how much they show.
 function stagger(xs) {
   let best = xs, bestScore = Infinity;
   function above(placed, index) {
@@ -114,6 +123,7 @@ function stagger(xs) {
     if (!left.length) { best = o; bestScore = score; return; }
     left.forEach((x, j) => {
       const i = o.length, k = coverKind(x), b = beside(i);
+      if (left.findIndex(y => coverKind(y) === k) < j) return;
       const cost = (b >= 0 && coverKind(o[b]) === k ? 10 : 0) + (above(o, i) === k ? 1 : 0);
       place([...o, x], left.filter((_, n) => n !== j), score + cost);
     });
