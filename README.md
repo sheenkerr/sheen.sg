@@ -9,7 +9,7 @@ A static site built with HTML, CSS, and plain JavaScript. No build step is requi
 - `js/toys.js`: interactive mini demos.
 - `js/logos.js`: shared logo lookup and markup helpers.
 - `js/app.js`: page rendering and interactions.
-- `images/`: local assets grouped by AWS, brands, Devicon, GCP, me (headshot and Apple touch icon), organizations, products, projects, and schools. Raster logos use prebuilt lossless WebP derivatives; original PNGs are retained. Regenerate the matching WebP when editing an original PNG.
+- `images/`: local assets grouped by AWS, brands, Devicon, GCP, me (headshot and Apple touch icon), organizations, products, projects, and schools. Raster logos use prebuilt WebP derivatives of the original PNGs, which are retained: lossless, except the BizBook, Distraction Dismantlers and FlowFox project logos, which are lossy WebP (quality 80, 90 and 80) that compare visually identical to their PNGs. Regenerate the matching WebP when editing an original PNG.
 - `fonts/`: self-hosted Manrope for headings. It is not loaded from Google Fonts, whose hinted Windows copy flattens the bottoms of letters.
 - `cv-sheen.pdf`: the CV the View CV buttons open in a new tab. Replace the file to update it.
 - `favicon.ico`: the site icon, cropped from the profile photo. It stays in the root, where browsers look for it on every page, the CV included.
