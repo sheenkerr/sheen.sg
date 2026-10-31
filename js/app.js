@@ -73,7 +73,7 @@ const REPO_MARK = { sqlancer: 'sqlancer.webp', bizbook: 'bizbook.webp', orbital:
 const STENCIL = ['flowfox', 'vault'];
 const repoMark = id => STENCIL.includes(id)
   ? `<span class="rmark stencil" style="--m:url(../images/projects/${REPO_MARK[id]})" aria-hidden="true"></span>`
-  : `<img class="rmark" src="images/projects/${REPO_MARK[id]}" alt="">`;
+  : `<img class="rmark" src="images/projects/${REPO_MARK[id]}" alt="" loading="lazy">`;
 // which colours a cover wears: a story about the company rather than one of its products wears the work blue with
 // Nested's mark, one product wears that product's, several share a plain cover, and a project its own
 function coverKind(item) {
@@ -235,7 +235,7 @@ addEventListener('resize', shelfEdges);
 shelfEl.scrollLeft = shelfEl.scrollWidth;
 shelfEdges();
 document.getElementById('edu').innerHTML = ME.education.map(e => `
-  <li><img class="crest" src="${esc(e.logo)}" data-dark="${esc(e.logo.replace(/(\.[^.]+)$/, '-dark$1'))}" alt="">
+  <li><img class="crest" src="${esc(e.logo)}" data-dark="${esc(e.logo.replace(/(\.[^.]+)$/, '-dark$1'))}" alt="" loading="lazy">
   <span class="when"><time datetime="${e.from}">${yearMonth(e.from)}</time> – <time datetime="${e.to}">${yearMonth(e.to)}</time></span>
   <b>${esc(e.school)}${e.programme ? `, ${esc(e.programme)}` : ''}</b><span class="what">${esc(e.award)}</span>
   ${e.merit ? `<span class="merit">Focus areas with Merit: ${e.merit.map(esc).join(' and ')}</span>` : ''}</li>`).join('');
@@ -285,13 +285,15 @@ const appTile = s => {
 const skEl = document.getElementById('sk');
 skEl.innerHTML = Object.entries(ME.skills).map(([g, v]) =>
   `<div class="sk-group"><h3>${esc(g)}</h3><div class="folders">${groupsOf(g, v.items).map(([label, mark, names]) =>
-  `<div class="folder">${label ? `<p class="folder-h">${mark ? `<img src="${mark}" alt="">` : ''}${esc(label)}</p>` : ''}<ul class="apps">${names.map(appTile).join('')}</ul></div>`).join('')}</div></div>`).join('');
+  `<div class="folder">${label ? `<p class="folder-h">${mark ? `<img src="${mark}" alt="" loading="lazy">` : ''}${esc(label)}</p>` : ''}<ul class="apps">${names.map(appTile).join('')}</ul></div>`).join('')}</div></div>`).join('');
 // the places that used it open straight under the pressed skill's folder, stories first, each opening its story.
 // Folders wrap, so the panel goes after the last folder on that folder's row and never splits a row.
 // Pressing the skill again closes them.
 const usedBox = document.createElement('div');
 usedBox.className = 'used'; usedBox.id = 'used'; usedBox.hidden = true;
 usedBox.innerHTML = '<p class="used-line" aria-live="polite"></p><ul class="used-list"></ul>';
+// it's on the page, hidden, from the start, so the skills' aria-controls always point at it
+skEl.append(usedBox);
 let usedFolder = null;
 function placeUsed() {
   usedBox.remove();
