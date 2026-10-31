@@ -348,7 +348,7 @@ function fill(x) {
       ${x.link || x.group === 'proj' ? `<div class="actions">
         ${x.link ? `<a class="btn soft" href="${esc(x.link.url)}" target="_blank" rel="noopener">${LINKEDIN}${esc(x.link.label)}</a>` : ''}
         ${x.group === 'proj' ? `<a class="btn soft" href="${esc(x.repo || '#')}" ${x.repo ? 'target="_blank" rel="noopener"' : 'data-cv'}>${GH}View the code on GitHub</a>` : ''}</div>` : ''}
-      <h4>Built with</h4><ul class="chips">${x.stack.map(chip).join('')}</ul>
+      <h4>Tools and skills</h4><ul class="chips">${x.stack.map(chip).join('')}</ul>
       <nav class="pn" aria-label="Other ${noun === 'story' ? 'stories' : 'projects'}">
         ${prev ? `<button class="prev" type="button" data-go="${prev.id}"><span>${chev('M10 3 5 8l5 5')}Previous ${noun}</span><b>${esc(prev.title)}</b></button>` : ''}
         ${next ? `<button class="next" type="button" data-go="${next.id}"><span>Next ${noun}${chev('M6 3l5 5-5 5')}</span><b>${esc(next.title)}</b></button>` : ''}
