@@ -1,0 +1,506 @@
+@charset "utf-8";
+  /* Bento and Today, as one home screen of widgets.
+     From Bento: the grid, one meaning per colour (lime is me and the main action; blue work, pink projects, violet study),
+     Nested's stories held together in Nested's yellow, each product in its own colours, and the rule that only things you can press lift off the page.
+     From Today: the glass top bar, system type for reading, soft cards without outlines, story covers that draw
+     themselves in and grow into the story, a featured story, progress rails, and light and dark.
+     Manrope is kept for display type only (titles and the name); everything you read at length is in the system font. */
+  /* Manrope is served from here, not Google Fonts: Google sends Windows a hinted copy that snaps the round bottoms of letters flat onto the baseline */
+  @font-face { font-family: "Manrope"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("../fonts/manrope-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: "Manrope"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("../fonts/manrope-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  :root {
+    --bg: #eef1ef;
+    --grid: rgba(16, 20, 24, .045);
+    --card: #ffffff;
+    /* cards you can press: in light mode the same white as a widget; dark mode lifts them one shade */
+    --raised: #ffffff;
+    --label: #1f1f26;
+    --heading: #2c2c35;
+    --secondary: #5b5b66;
+    --sep: #e1e3e6;
+    --lime: #d9f37a;
+    /* the intro is me, so it wears lime; dark mode keeps lime for the greeting only */
+    --me: #d9f37a;
+    --me-ink: #101418;
+    --close: #eef8cc; --close-ink: var(--heading);
+    --work: #8dbbff; --work-soft: #e2edff; --work-ink: #1d4e8f;
+    --proj: #ff9fbb; --proj-soft: #ffe4eb; --proj-ink: #962247;
+    --study: #b9a6ff; --study-soft: #ece8ff; --study-ink: #4f35a3;
+    --nested-soft: #fff3bd;
+    /* Julia wears its logo, navy on cream, in both modes */
+    --julia: #fef7ec; --julia-ink: #002645;
+    --mailmail: linear-gradient(160deg, #faf8dc 0%, #bdf4f5 100%); --mailmail-ink: #101418;
+    --autoscrape: #021433;
+    /* a story about the job at Nested rather than a product wears the work blue, the same as the Work widget; Nested's yellow
+       mark stands out on it, where a yellow cover would melt into the yellow stack */
+    --company: #e2edff; --company-ink: #1d4e8f;
+    --multi: #f1f2f4; --multi-ink: #1f1f26;
+    --glass: rgba(255, 255, 255, .72);
+    --glass-edge: rgba(0, 0, 0, .08);
+    --lift: 0 1px 2px rgba(0, 0, 0, .06), 0 10px 28px -14px rgba(0, 0, 0, .3);
+    --lift-hover: 0 2px 4px rgba(0, 0, 0, .06), 0 20px 38px -16px rgba(0, 0, 0, .36);
+    --term: #101418;
+    /* single-colour dark marks (Django) turn white in dark mode */
+    --ink-filter: none;
+    --display: "Manrope", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --grid: rgba(255, 255, 255, .05); --card: #1c1c1e; --raised: #2c2c2e;
+      --label: #e3e3e8; --heading: #d2d2d8; --secondary: #a1a1aa; --sep: #2f2f33;
+      /* the intro is a plain raised card; only the greeting is lime */
+      --me: #1c1c1e; --me-ink: #d9f37a; --close: #1c1c1e; --close-ink: #d9f37a;
+      --work-soft: #142238; --work-ink: #9cc4ff;
+      --proj-soft: #321b24; --proj-ink: #ffa3bf;
+      --study-soft: #211c38; --study-ink: #c4b6ff;
+      /* Nested's stack is a darker well than the other widgets. Projects takes a deep tint of its pink, the way Work is deep blue
+         and Education deep violet, so the two hold the same raised grey cards on different grounds */
+      --nested-soft: #111113; --proj-well: #2b1821;
+      /* story covers keep the light mode's colours, a shade deeper so they don't glare */
+      --julia: #ebe2d2; --julia-ink: #002645;
+      --mailmail: linear-gradient(160deg, #e2dfbd 0%, #a7dcdd 100%); --mailmail-ink: #101418;
+      --company: #c9d9f3; --company-ink: #1b3f73;
+      --multi: #d6d8dc; --multi-ink: #1f1f26;
+      --glass: rgba(36, 36, 40, .72); --glass-edge: rgba(255, 255, 255, .1);
+      --lift: 0 0 0 1px rgba(255, 255, 255, .07); --lift-hover: 0 0 0 1px rgba(255, 255, 255, .2);
+      --term: #0b0d10;
+      --ink-filter: brightness(0) invert(1);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --grid: rgba(255, 255, 255, .05); --card: #1c1c1e; --raised: #2c2c2e;
+    --label: #e3e3e8; --heading: #d2d2d8; --secondary: #a1a1aa; --sep: #2f2f33;
+    /* the intro is a plain raised card; only the greeting is lime */
+    --me: #1c1c1e; --me-ink: #d9f37a; --close: #1c1c1e; --close-ink: #d9f37a;
+    --work-soft: #142238; --work-ink: #9cc4ff;
+    --proj-soft: #321b24; --proj-ink: #ffa3bf;
+    --study-soft: #211c38; --study-ink: #c4b6ff;
+    /* Nested's stack is a darker well than the other widgets. Projects takes a deep tint of its pink, the way Work is deep blue
+       and Education deep violet, so the two hold the same raised grey cards on different grounds */
+    --nested-soft: #111113; --proj-well: #2b1821;
+    /* story covers keep the light mode's colours, a shade deeper so they don't glare */
+    --julia: #ebe2d2; --julia-ink: #002645;
+    --mailmail: linear-gradient(160deg, #e2dfbd 0%, #a7dcdd 100%); --mailmail-ink: #101418;
+    --company: #c9d9f3; --company-ink: #1b3f73;
+    --multi: #d6d8dc; --multi-ink: #1f1f26;
+    --glass: rgba(36, 36, 40, .72); --glass-edge: rgba(255, 255, 255, .1);
+    --lift: 0 0 0 1px rgba(255, 255, 255, .07); --lift-hover: 0 0 0 1px rgba(255, 255, 255, .2);
+    --term: #0b0d10;
+    --ink-filter: brightness(0) invert(1);
+    color-scheme: dark;
+  }
+  :root[data-theme="dark"] .cover.proj { --cv: var(--pd); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .cover.proj { --cv: var(--pd); }
+  }
+  @media (prefers-reduced-transparency: reduce) { :root { --glass: var(--card); } }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-padding-top: 76px; }
+  body {
+    overflow-wrap: anywhere;
+    margin: 0; color: var(--label);
+    font-family: system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
+    font-size: 1.0625rem; line-height: 1.5; -webkit-font-smoothing: antialiased;
+    /* Bento's graph paper, faint enough to sit behind soft cards */
+    background-color: var(--bg);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--heading); outline-offset: 3px; }
+  .col { max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+  h1, h2, h3 { font-family: var(--display); }
+
+  /* ---------- top bar: the name, the sections, then the ways to reach me ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--glass); border-bottom: 1px solid var(--glass-edge);
+    backdrop-filter: blur(20px) saturate(1.6); -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  }
+  .topbar .col { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 4px; padding-top: 10px; padding-bottom: 10px; }
+  .home { margin: 0; font-size: 1.625rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .home a { color: var(--heading); text-decoration: none; }
+  .tabs { margin: 0 auto; }
+  .tabs ul { display: flex; gap: 2px; list-style: none; margin: 0; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--label) 7%, transparent); }
+  .tabs a { display: flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 16px; border-radius: 999px; color: var(--secondary); font-size: 0.9375rem; font-weight: 600; text-decoration: none; }
+  .tabs a:hover { color: var(--label); }
+  .tabs a[aria-current="true"] { background: var(--card); color: var(--label); box-shadow: 0 1px 4px rgba(0, 0, 0, .14); }
+  .reach { display: flex; align-items: center; gap: 4px; }
+  .reach .btn { min-height: 40px; padding: 0 16px; font-size: 0.9375rem; margin-right: 6px; }
+  .icon-link { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--label); cursor: pointer; }
+  .icon-link:hover { background: color-mix(in srgb, var(--label) 8%, transparent); }
+  .icon-link svg { width: 22px; height: 22px; }
+  .theme .sun, .theme.is-dark .moon { display: none; }
+  .theme.is-dark .sun { display: block; }
+
+  /* lime is the main action, as on Bento; the soft button is everything else */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 22px; border-radius: 999px; border: 0; cursor: pointer;
+    background: var(--lime); color: #101418; font: 600 1rem system-ui, sans-serif; text-decoration: none;
+  }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .btn.soft { background: color-mix(in srgb, var(--label) 9%, transparent); color: var(--label); }
+  .btn[aria-disabled] { opacity: .55; cursor: progress; }
+  .link { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none; color: inherit; font: 600 0.9375rem system-ui, sans-serif; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: pointer; }
+  .link svg { width: 17px; height: 17px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* ---------- logos ----------
+     Logos sit straight on the widget in both themes. DSTA and the schools swap to their reverse versions in dark mode. */
+  img[src^="images/aws/"], img[src$="react-native.png"], img[src$="react-native.webp"] { border-radius: 22%; }
+  img.ink { filter: var(--ink-filter); }
+
+  /* ---------- the home screen ---------- */
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 22px 0 72px; }
+  .s2 { grid-column: span 2; } .s4 { grid-column: 1 / -1; }
+  /* a widget is flat; only a widget you can press lifts, and lifts further under the pointer */
+  .w { --wbg: var(--card); background: var(--wbg); border-radius: 24px; padding: 22px; min-width: 0; }
+  .press {
+    appearance: none; border: 0; margin: 0; cursor: pointer; text-align: left; color: inherit; font: inherit; width: 100%;
+    box-shadow: var(--lift); transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .press:hover { transform: translateY(-2px); box-shadow: var(--lift-hover); }
+  .press:active { transform: scale(.98); }
+  @media (prefers-reduced-motion: reduce) { .press { transition: none; } .press:hover, .press:active { transform: none; } }
+  /* every widget title shares one style */
+  .w-title { margin: 0 0 14px; color: var(--heading); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .w-sub { margin: -8px 0 16px; color: var(--secondary); font-size: 0.9375rem; }
+
+  /* intro: me, in lime */
+  .intro { --wbg: var(--me); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 22px; align-items: center; }
+  .photo { display: block; width: 104px; height: 104px; margin: 0; border-radius: 26px; object-fit: cover; rotate: -3deg; background: var(--card); }
+  .intro p { margin: 0; font-size: 1.125rem; }
+  .intro .hi { margin-bottom: 6px; color: var(--me-ink); font-family: var(--display); font-size: clamp(2.25rem, 4.4vw, 3.25rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+  .wave { display: inline-block; transform-origin: 70% 75%; animation: wave 1.8s ease-in-out .5s; }
+  .hi:hover .wave { animation-name: wave-again; }
+  @keyframes wave { 0%, 60%, 100% { rotate: 0deg; } 10%, 30% { rotate: 14deg; } 20% { rotate: -8deg; } 40% { rotate: -4deg; } 50% { rotate: 10deg; } }
+  @keyframes wave-again { 0%, 60%, 100% { rotate: 0deg; } 10%, 30% { rotate: 14deg; } 20% { rotate: -8deg; } 40% { rotate: -4deg; } 50% { rotate: 10deg; } }
+  @media (prefers-reduced-motion: reduce) { .wave, .hi:hover .wave { animation: none; } }
+
+  /* ---------- progress rails ----------
+     Each chapter widget reads down a line in its own colour, newest at the top. A step still going has a filled dot,
+     and dates always take the chapter's colour so they're the first thing to find. */
+  .work { --wbg: var(--work-soft); --rail: var(--work-ink); }
+  .projects { --wbg: var(--proj-well, var(--card)); --rail: var(--proj-ink); }
+  .edu { --wbg: var(--study-soft); --rail: var(--study-ink); }
+  .rail { list-style: none; margin: 0; padding: 0; }
+  .rail > li { position: relative; padding: 0 0 20px 28px; }
+  .rail > li:last-child { padding-bottom: 0; }
+  .rail > li:not(:last-child)::before { content: ""; position: absolute; left: 5px; top: 12px; bottom: -12px; width: 2px; background: color-mix(in srgb, var(--rail) 30%, transparent); }
+  .rail > li::after { content: ""; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--rail); background: var(--wbg); }
+  .rail > li.current::after { background: var(--rail); }
+  .when { display: block; color: var(--rail); font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rail b { display: block; font-size: 1.0625rem; line-height: 1.3; }
+  .rail .what { display: block; color: var(--secondary); font-size: 0.9375rem; }
+
+  .jobs > li { display: grid; grid-template-columns: minmax(0, 1fr) 96px; column-gap: 14px; align-items: start; }
+  /* both marks sit centred in the same column, level with their entry; a square app mark is drawn larger than a
+     wordmark so the two look the same weight */
+  .jobs .org { grid-column: 2; grid-row: 1 / span 3; justify-self: center; align-self: center; width: 96px; height: 44px; object-fit: contain; object-position: center; }
+  .jobs .org.sq { width: 56px; height: 56px; border-radius: 13px; }
+  .jobs > li > :not(.org) { grid-column: 1; }
+
+  /* projects: a shelf of covers under one pink timeline, oldest first; arrows appear when they don't all fit */
+  .shelf-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+  .shelf-head .w-title { margin: 0; }
+  .shelf-nav { display: flex; gap: 8px; }
+  .shelf-nav button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; background: color-mix(in srgb, var(--label) 8%, transparent); color: var(--label); }
+  .shelf-nav button:hover:not(:disabled) { background: color-mix(in srgb, var(--label) 14%, transparent); }
+  .shelf-nav button:disabled { opacity: .35; cursor: default; }
+  .shelf-nav svg { width: 16px; height: 16px; }
+  .shelf { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 42px) / 4); gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 22px; margin: 0 -22px -6px; padding: 4px 22px 10px; scrollbar-width: none; }
+  .shelf::-webkit-scrollbar { display: none; }
+  /* while a mouse drags it, the shelf follows the pointer freely and snaps to a card again on release */
+  .shelf.dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+  .shelf.dragging .press { cursor: grabbing; }
+  .proj-item { display: grid; grid-template-rows: auto 1fr; gap: 10px; scroll-snap-align: start; }
+  .tick { position: relative; margin: 0; padding-top: 20px; }
+  .tick::before { content: ""; position: absolute; top: 5px; left: 6px; right: -14px; height: 2px; background: color-mix(in srgb, var(--rail) 35%, transparent); }
+  .tick::after { content: ""; position: absolute; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--rail); background: var(--wbg); }
+  .proj-item:last-child .tick::before { display: none; }
+  /* projects from the same semester: the first keeps its dot and date, a solid bar runs from that dot across every card
+     that shares them, and the usual thin line carries on to the next semester. The repeated date stays for screen readers. */
+  .tick.span::before, .tick.cont::before { top: 3px; height: 6px; border-radius: 0 3px 3px 0; }
+  .tick.span::before { background: var(--rail); border-radius: 3px 0 0 3px; }
+  .tick.cont.span::before { border-radius: 0; }
+  .tick.cont::before {
+    left: 0;
+    background: linear-gradient(var(--rail), var(--rail)) left / calc(100% - 14px) 100% no-repeat,
+      linear-gradient(color-mix(in srgb, var(--rail) 35%, transparent), color-mix(in srgb, var(--rail) 35%, transparent)) right / 14px 2px no-repeat;
+  }
+  .tick.cont.span::before { background: var(--rail); }
+  .proj-item:last-child .tick.cont::before { display: block; right: 0; background: var(--rail); }
+  .tick.cont::after { display: none; }
+  .tick.cont .when { color: transparent; }
+  /* when the shelf shows only a card or two, the first of the pair can be scrolled away, so every card keeps its date */
+  @media (max-width: 1023px) { .tick.cont .when { color: var(--rail); } }
+  .shelf .story { border-radius: 20px; }
+  /* a project card's line reads like a story card's outcome: bold, in the main text colour */
+  .shelf .story .sum { color: var(--label); font-size: 0.9375rem; font-weight: 600; line-height: 1.35; }
+
+  .edu li { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: 14px; }
+  .edu .crest { grid-column: 2; grid-row: 1 / span 4; justify-self: end; width: 104px; height: 48px; object-fit: contain; object-position: right center; }
+  .edu li > :not(.crest) { grid-column: 1; }
+  .merit { display: block; margin-top: 2px; font-size: 0.9375rem; }
+
+
+  /* ---------- Nested: one yellow stack holding its stories and the toy ---------- */
+  .nested { grid-column: 1 / -1; color: var(--nested-text, inherit); background: var(--nested-soft); border-radius: 36px; padding: 12px; }
+  .n-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 16px 16px 20px; }
+  .n-head .mark { grid-row: 1 / span 2; width: 60px; height: 60px; border-radius: 14px; }
+  .n-head h2 { margin: 0; color: var(--nested-text, var(--heading)); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .n-head .role { color: var(--nested-muted, var(--secondary)); font-size: 0.9375rem; font-weight: 600; }
+  .n-head p { grid-column: 1 / -1; margin: 10px 0 0; max-width: 54em; }
+  /* a product named in running text carries its mark */
+  .prod { white-space: nowrap; font-weight: 700; }
+  .prod img { width: 1.25em; height: 1.25em; margin-right: 4px; vertical-align: -0.28em; object-fit: contain; }
+  .n-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; grid-auto-flow: dense; }
+  .n-grid > * { border-radius: 24px; }
+  /* the stack opens with three stories and the guard; the rest wait behind "Show all stories" */
+  .n-grid:not(.open) > .more { display: none; }
+  .n-more { display: flex; justify-content: center; padding: 14px 0 4px; }
+  .n-more .btn { background: var(--raised); color: var(--label); box-shadow: var(--lift); }
+  .n-more svg { transition: rotate .2s; }
+  .n-more [aria-expanded="true"] svg { rotate: 180deg; }
+  /* cards on the yellow stack keep the page's own text colours */
+  .nested .story, .nested .toy { color: var(--label); }
+
+  /* ---------- story widgets: Today's covers, in each product's own colours ---------- */
+  .story { display: flex; flex-direction: column; padding: 0; overflow: hidden; background: var(--raised); }
+  .story.feat { grid-column: span 2; grid-row: span 2; }
+  .cover { position: relative; flex: 1 0 auto; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px; background: var(--cv); color: var(--cv-ink); overflow: hidden; }
+  .cover.julia { --cv: var(--julia); --cv-ink: var(--julia-ink); }
+  .cover.mailmail { --cv: var(--mailmail); --cv-ink: var(--mailmail-ink); }
+  .cover.company { --cv: var(--company); --cv-ink: var(--company-ink); }
+  .cover.multi { --cv: var(--multi); --cv-ink: var(--multi-ink); padding-top: 28px; }
+  /* each project has a colour of its own */
+  .cover.proj { --cv: var(--pc); --cv-ink: var(--pi); }
+  .cover svg.art { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .75; }
+  /* in a small widget the drawing runs behind the title, so it steps back */
+  /* in a card the drawing keeps to the top of the cover and the title sits below it, so they never overlap.
+     A cover is only as tall as the two need, with a floor, so the line between cover and text stays level across
+     a row unless a title runs to three lines */
+  .story:not(.feat) .cover { flex: none; min-height: 196px; padding-top: 108px; }
+  .story:not(.feat) .cover svg.art { inset: 14px 14px auto auto; width: calc(100% - 28px); height: 84px; opacity: .7; }
+  .shelf .story .cover { min-height: 168px; padding-top: 104px; }
+  .shelf .story .cover svg.art { height: 78px; }
+  /* a repo's own mark sits where a drawing would, top right */
+  .cover .rmark { position: absolute; top: 16px; right: 16px; width: 76px; height: 76px; object-fit: contain; }
+  .cover .rmark.stencil { background: currentColor; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+  .reader .cover .rmark { top: 28px; right: 28px; width: clamp(110px, 22vw, 160px); height: clamp(110px, 22vw, 160px); }
+  .story:not(.feat) .foot { flex: 1; align-content: start; }
+  /* a story across products wears a ribbon of each, as on Bento */
+  /* hairlines under and between the bands, so pale brands still read against a pale cover */
+  .ribbon { position: absolute; top: 0; left: 0; right: 0; height: 12px; display: flex; box-shadow: 0 1px 0 color-mix(in srgb, var(--label) 16%, transparent); }
+  .ribbon i { flex: 1; background: var(--b); }
+  .ribbon i + i { box-shadow: -1px 0 0 color-mix(in srgb, var(--label) 16%, transparent); }
+  .kicker { position: relative; display: flex; align-items: center; flex-wrap: wrap; margin: 0 0 6px; font-size: 0.875rem; font-weight: 600; }
+  /* the product marks say whose story it is, so they're big enough to read at a glance; bigger again on the big covers */
+  .kicker .pm { width: 34px; height: 34px; margin-right: -8px; border-radius: 50%; object-fit: contain; box-shadow: 0 0 0 2px rgba(0, 0, 0, .08); }
+  .kicker .pm:last-of-type { margin-right: 8px; }
+  .story.feat .kicker .pm, .reader .kicker .pm { width: 40px; height: 40px; }
+  .cover h3 { position: relative; margin: 0; overflow-wrap: break-word; font-size: 1.1875rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+  .story.feat .cover { min-height: 300px; padding: 26px; }
+  .story.feat .cover svg.art { inset: 18px 18px auto auto; width: calc(100% - 36px); height: 44%; }
+  .story.feat .cover h3 { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.03em; max-width: 14em; }
+  /* when the featured story runs the full width, the drawing sits beside the title instead of above it,
+     so the cover can be much shorter. A drawing is half again as wide as it is tall, so at 140px tall it takes
+     the right 209px plus its inset, and the title stops short of that. The title steps down a size so a
+     title like "Stripe billing, from nothing to live" fits on one line beside it on a tablet */
+  @media (max-width: 1023px) {
+    .story.feat .cover { min-height: 210px; }
+    .story.feat .cover svg.art { height: 140px; }
+    .story.feat .cover h3 { max-width: calc(100% - 214px); font-size: clamp(1.5rem, 3vw, 2.25rem); }
+  }
+  /* too narrow for side by side: the drawing goes back above the title, smaller */
+  @media (max-width: 600px) {
+    .story.feat .cover { min-height: 0; padding-top: 124px; }
+    .story.feat .cover svg.art { height: 92px; }
+    .story.feat .cover h3 { max-width: none; }
+  }
+  .story .foot { display: grid; gap: 8px; padding: 14px 18px 16px; }
+  .story .sum { color: var(--secondary); font-size: 0.9375rem; }
+  /* the outcome reads as a sentence with a tick, so it makes sense without knowing the story */
+  .outcome { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9375rem; font-weight: 600; line-height: 1.35; }
+  .outcome svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+
+  /* ---------- try it: the sign-up guard, built like the featured story beside it ----------
+     A Mailmail cover with the title at the foot and the three sign-up slots drawn where a story's drawing would be,
+     then the guard's state, its Redis log and the buttons on the widget below. */
+  .n-grid > .toy { grid-row: span 2; }
+  .toy { display: flex; flex-direction: column; padding: 0; background: var(--raised); overflow: hidden; }
+  .toy .cover { padding: 22px 26px 24px; }
+  .toy .cover h3 { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.03em; }
+  .toy .lede { position: relative; margin: 8px 0 0; max-width: 30em; color: color-mix(in srgb, var(--cv-ink) 72%, transparent); font-size: 0.9375rem; }
+  .toy .foot { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; }
+  /* every message is short enough for one line at the narrowest width, so the log never moves */
+  .toy-state { margin: 0; overflow: hidden; font-size: 1rem; font-weight: 600; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+  .toy-log { flex: 1 0 calc(3 * 1.6em + 24px); list-style: none; margin: 0; padding: 12px 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 14px; background: var(--term); color: #b9c3cc; font: 0.8125rem/1.6 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; }
+  .toy-log li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toy-log li::before { content: "› "; color: var(--lime); }
+  .toy-log li:last-child { color: #fff; }
+  .toy-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .toy-actions .link { margin-left: auto; }
+  /* the slots sit at the top of the cover in its ink; a paused IP strikes them through, with the time left beside them */
+  .toy-meter { position: relative; display: flex; align-items: center; gap: 10px; min-height: 30px; margin-bottom: auto; padding-bottom: 18px; }
+  .toy-meter i { flex: 0 1 64px; min-width: 24px; height: 20px; border-radius: 999px; background: color-mix(in srgb, var(--cv-ink) 14%, transparent); transition: background .2s; }
+  .toy-meter i.on { background: var(--cv-ink); }
+  .toy-blocked .toy-meter i { background: repeating-linear-gradient(-45deg, var(--cv-ink) 0 5px, color-mix(in srgb, var(--cv-ink) 14%, transparent) 5px 10px); }
+  .toy-ttl { flex: none; min-width: calc(8ch + 24px); height: 24px; margin-left: auto; padding: 0 12px; border-radius: 999px; background: var(--cv-ink); color: #fff; font: 600 0.875rem/24px ui-monospace, Consolas, monospace; font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
+  /* the timer and "Skip a day" keep their room while hidden, so pausing and un-pausing never moves anything */
+  .toy .toy-ttl[hidden] { display: block !important; visibility: hidden; }
+  .toy .toy-reset[hidden] { display: inline-flex !important; visibility: hidden; }
+  /* with the stories one or two across, the guard takes the full width: cover on the left, the controls on the right */
+  @media (max-width: 1023px) {
+    .n-grid > .toy { grid-column: 1 / -1; grid-row: auto; }
+  }
+  @media (min-width: 600px) and (max-width: 1023px) {
+    .n-grid > .toy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  }
+  .toy-bump .toy-meter { animation: bump .3s; }
+  @keyframes bump { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  @media (prefers-reduced-motion: reduce) { .toy-bump .toy-meter { animation: none; } .toy-meter i { transition: none; } }
+
+  /* ---------- skills: app icons in folders, named underneath the way a home screen names them ---------- */
+  .sk-group + .sk-group { margin-top: 18px; }
+  .sk-group h3 { margin: 0 0 8px; color: var(--secondary); font-family: inherit; font-size: 0.875rem; font-weight: 700; }
+  .folders { display: flex; flex-wrap: wrap; gap: 12px; }
+  .folder { padding: 10px 8px 6px; border-radius: 22px; background: color-mix(in srgb, var(--label) 5%, transparent); }
+  .folder-h { display: flex; align-items: center; gap: 6px; margin: 0 8px 6px; font-size: 0.8125rem; font-weight: 700; }
+  .folder-h img { width: 18px; height: 18px; border-radius: 4px; }
+  .apps { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+  .app { width: 80px; display: grid; justify-items: center; gap: 5px; padding: 4px 2px 6px; text-align: center; }
+  .icon { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 13px; background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); overflow: hidden; }
+  .icon img { width: 34px; height: 34px; object-fit: contain; }
+  .icon img[src$="celery.png"], .icon img[src$="celery.webp"] { width: 46px; }
+  /* marks that are already app squares fill the whole icon */
+  .icon img.fill { width: 100%; height: 100%; border-radius: 0; }
+  .icon .mono { display: grid; place-items: center; width: 100%; height: 100%; background: var(--b); color: var(--f); font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
+  .app .name { font-size: 0.75rem; font-weight: 600; line-height: 1.2; overflow-wrap: normal; }
+  /* a skill with work behind it can be pressed: it wears a count of the places it was used, and lime once it's picked */
+  button.app { position: relative; border: 0; border-radius: 16px; background: none; color: inherit; font: inherit; cursor: pointer; }
+  button.app:hover { background: color-mix(in srgb, var(--label) 7%, transparent); }
+  button.app[aria-pressed="true"] { background: var(--lime); color: #101418; }
+  .app .n { position: absolute; top: 0; right: 6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--label); color: var(--card); font: 700 0.6875rem/20px system-ui, sans-serif; text-align: center; }
+  /* where I used it: only the stories and projects that used the pressed skill, under its group, each with a lime edge */
+  .used { flex: 0 0 100%; padding: 14px; border-radius: 20px; background: var(--bg); }
+  .used-line { margin: 0 0 12px; font-weight: 600; }
+  .used-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .used .press { display: block; height: 100%; padding: 10px 14px; border-radius: 12px; background: var(--raised); box-shadow: var(--lift), inset 4px 0 0 var(--lime); font-size: 0.9375rem; font-weight: 600; line-height: 1.3; }
+  .used .press:hover { box-shadow: var(--lift-hover), inset 4px 0 0 var(--lime); }
+  .used small { display: block; margin-top: 2px; color: var(--secondary); font-size: 0.8125rem; font-weight: 500; }
+
+  /* ---------- contact ---------- */
+  /* the page closes on me, as it opens: a soft lime in light mode; in dark mode a plain card with a lime title, like Hi */
+  .contact { --wbg: var(--close); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+  .contact .w-title { margin: 0; color: var(--close-ink); }
+  .contact .links { display: flex; align-items: center; gap: 8px 22px; flex-wrap: wrap; }
+  .contact .btn { box-shadow: var(--lift); }
+  /* LinkedIn and GitHub stay together, so on a narrow screen they wrap as a pair under the CV button */
+  .contact .profiles { display: flex; gap: 8px 22px; }
+
+  /* chips for "Built with", with the same marks as Skills */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 8px 0 0; padding: 0; }
+  .chips li { display: inline-flex; align-items: center; gap: 7px; background: var(--bg); border-radius: 999px; padding: 4px 12px; font-size: 0.9375rem; }
+  .chips li:has(img, .mono) { padding-left: 5px; }
+  .chips img, .chips .mono { flex: none; width: 24px; height: 24px; }
+  .chips img { object-fit: contain; }
+  .chips .mono { display: grid; place-items: center; width: auto; min-width: 24px; padding: 0 4px; border-radius: 6px; background: var(--b); color: var(--f); font-size: 0.625rem; font-weight: 800; }
+
+  /* ---------- story view: the widget's cover grows into the page ---------- */
+  dialog.reader {
+    width: min(760px, 100vw); max-width: 100vw; max-height: 100dvh; height: 100dvh; margin: 0 auto; padding: 0; border: 0;
+    background: var(--card); color: var(--label); overflow: auto; overscroll-behavior: contain;
+  }
+  @media (min-width: 800px) { dialog.reader { height: calc(100dvh - 48px); margin: 24px auto; border-radius: 28px; } }
+  dialog.reader::backdrop { background: rgba(0, 0, 0, .45); }
+  .reader .cover { min-height: 360px; padding: 28px; }
+  .reader .cover svg.art { inset: 28px 28px auto auto; width: calc(100% - 56px); height: 40%; }
+  .reader .cover h3 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; letter-spacing: -0.03em; max-width: 16em; }
+  .reader .close {
+    position: sticky; top: 14px; float: right; margin: 14px 14px -58px 0; z-index: 3;
+    width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center;
+    background: rgba(0, 0, 0, .4); color: #fff; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  @media (prefers-reduced-transparency: reduce) { .reader .close { background: #000; } }
+  .reader .body { padding: 26px 26px 40px; max-width: 660px; }
+  .reader .r-mod { margin: 0 0 6px; color: var(--secondary); font-size: 0.9375rem; font-weight: 600; }
+  .reader .lead { font-size: 1.25rem; line-height: 1.45; margin: 0 0 24px; }
+  .reader h4 { margin: 26px 0 8px; font-family: var(--display); font-size: 1.0625rem; font-weight: 700; }
+  .reader p { margin: 0 0 12px; }
+  .reader ul:not(.chips) { margin: 0 0 12px; padding-left: 22px; }
+  .reader ul:not(.chips) li { margin-bottom: 8px; }
+  /* the result is the win, so it wears lime */
+  .reader .result { background: color-mix(in srgb, var(--lime) 55%, var(--card)); border-radius: 16px; padding: 16px 18px; font-weight: 600; }
+  .reader .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  /* previous on the left, next on the right; each keeps its side when it's the only one */
+  .reader .pn { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 32px; }
+  .reader .pn button { display: block; width: 100%; text-align: left; border: 0; cursor: pointer; padding: 18px 20px; border-radius: 18px; background: var(--bg); color: var(--label); font: inherit; }
+  .reader .pn .next { grid-column: 2; text-align: right; }
+  .reader .pn span { display: flex; align-items: center; gap: 4px; color: var(--secondary); font-size: 0.875rem; }
+  .reader .pn .next span { justify-content: flex-end; }
+  .reader .pn svg { width: 14px; height: 14px; flex: none; }
+  .reader .pn b { display: block; font-size: 1.125rem; line-height: 1.3; }
+  @media (max-width: 520px) { .reader .pn { grid-template-columns: minmax(0, 1fr); } .reader .pn .next { grid-column: auto; } }
+  @media (min-width: 1024px) {
+    dialog.reader { width: min(920px, calc(100vw - 96px)); }
+    .reader .cover { min-height: 420px; }
+    .reader .body { padding: 34px 40px 48px; max-width: 720px; }
+  }
+  ::view-transition-group(story-cover) { animation-duration: .42s; animation-timing-function: cubic-bezier(.3, .9, .3, 1); }
+
+  /* covers draw themselves in, once */
+  .art.pre > * { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .art.draw > * { animation: draw 1s cubic-bezier(.3, .9, .3, 1) both; animation-delay: min(calc(var(--i, 0) * 45ms), 600ms); }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* ---------- smaller screens ---------- */
+  @media (max-width: 1023px) {
+    html { scroll-padding-top: 72px; }
+    .col { padding: 0 24px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .n-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .story.feat { grid-row: auto; grid-column: 1 / -1; }
+    .shelf { grid-auto-columns: calc((100% - 14px) / 2.25); }
+    /* the name and contact row scroll away; the sections stay pinned */
+    .topbar { top: -50px; }
+    .topbar .col { column-gap: 12px; }
+    .theme { order: 2; }
+    .icon-link { width: 40px; height: 40px; }
+    .reach .btn { padding: 0 14px; margin-right: 2px; }
+    .reach { margin-left: auto; }
+    .tabs { order: 1; flex: 1 1 calc(100% - 56px); margin: 0; }
+    .tabs ul { flex: 1; }
+    .tabs li { flex: 1 1 auto; }
+    .tabs a { padding: 0 8px; white-space: nowrap; }
+  }
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .s2 { grid-column: auto; }
+  }
+  @media (max-width: 560px) {
+    .col { padding: 0 16px; }
+    .grid { gap: 14px; }
+    .w { padding: 20px; }
+    .intro { grid-template-columns: 1fr; }
+    .photo { width: 84px; height: 84px; border-radius: 22px; }
+    .nested { padding: 8px; border-radius: 32px; }
+    .n-head { padding: 14px 12px 16px; }
+    .n-head .mark { width: 48px; height: 48px; border-radius: 12px; }
+    .n-grid { grid-template-columns: minmax(0, 1fr); }
+    .shelf { grid-auto-columns: 78%; margin: 0 -20px -6px; padding: 4px 20px 10px; scroll-padding-inline: 20px; }
+    .n-grid .s2 { grid-column: auto; }
+    .app { width: 74px; }
+    .reader .cover { min-height: 280px; }
+    .reader .body { padding: 22px 18px 40px; }
+  }
+  @media (max-width: 480px) {
+    .home { font-size: 1.375rem; }
+    .reach .btn .long { display: none; }
+    .tabs a { padding: 0 6px; font-size: 0.875rem; }
+  }
