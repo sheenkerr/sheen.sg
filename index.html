@@ -3,12 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sheen</title>
+<title>Sheen – Software Engineer in Singapore</title>
 <script>
 // Apply the saved theme before the page draws, without a blocking network request.
 try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
-<meta name="description" content="Sheen is a software engineer in Singapore who builds backend services and the cloud deployment behind them.">
+<meta name="description" content="Sheen is a software engineer at DSTA in Singapore and an NUS Computer Science graduate, building backend services and the cloud deployment behind them.">
+<meta name="author" content="Wong Sheen Kerr">
+<link rel="canonical" href="https://sheen.sg/">
+<!-- how the page looks when shared on LinkedIn, WhatsApp, Telegram and X -->
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Sheen">
+<meta property="og:url" content="https://sheen.sg/">
+<meta property="og:title" content="Sheen – Software Engineer in Singapore">
+<meta property="og:description" content="Sheen is a software engineer at DSTA in Singapore and an NUS Computer Science graduate, building backend services and the cloud deployment behind them.">
+<meta property="og:image" content="https://sheen.sg/images/me/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Sheen, Software Engineer in Singapore, sheen.sg, beside a photo of Sheen">
+<meta property="profile:first_name" content="Sheen Kerr">
+<meta property="profile:last_name" content="Wong">
+<meta name="twitter:card" content="summary_large_image">
+<!-- for search engines only: the full name behind "Sheen", and the work, school and profiles that go with it -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://sheen.sg/#me",
+      "name": "Wong Sheen Kerr",
+      "alternateName": ["Sheen", "Sheen Kerr"],
+      "givenName": "Sheen Kerr",
+      "familyName": "Wong",
+      "url": "https://sheen.sg/",
+      "image": "https://sheen.sg/images/me/headshot.jpg",
+      "jobTitle": "Software Engineer",
+      "worksFor": { "@type": "GovernmentOrganization", "name": "DSTA", "alternateName": "Defence Science and Technology Agency", "url": "https://www.dsta.gov.sg/" },
+      "alumniOf": [
+        { "@type": "CollegeOrUniversity", "name": "National University of Singapore", "alternateName": "NUS" },
+        { "@type": "CollegeOrUniversity", "name": "Ngee Ann Polytechnic" }
+      ],
+      "homeLocation": { "@type": "Place", "name": "Singapore" },
+      "knowsAbout": ["Backend development", "Python", "PostgreSQL", "AWS", "Cloud deployment"],
+      "sameAs": ["https://www.linkedin.com/in/sheenkerr/", "https://github.com/sheenkerr"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://sheen.sg/#site",
+      "url": "https://sheen.sg/",
+      "name": "Sheen",
+      "alternateName": ["sheen.sg", "Sheen Singapore"],
+      "author": { "@id": "https://sheen.sg/#me" }
+    }
+  ]
+}
+</script>
 <link rel="icon" href="favicon.ico" sizes="32x32 64x64">
 <link rel="apple-touch-icon" href="images/me/apple-touch-icon.png">
 <link rel="preload" href="fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -42,7 +92,7 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
       <img class="photo" src="images/me/headshot.jpg" width="320" height="320" alt="Photo of Sheen">
       <div>
         <p class="hi">Hi <span class="wave" role="img" aria-label="waving hand">👋</span></p>
-        <p>Software engineer in Singapore. I build backend services, the data models under them and the deployment around them.</p>
+        <p>Software engineer at DSTA in Singapore and an NUS Computer Science graduate. I build backend services, the data models under them and the deployment around them.</p>
       </div>
     </section>
 
