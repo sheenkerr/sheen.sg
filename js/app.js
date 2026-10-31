@@ -393,13 +393,26 @@ reader.addEventListener('click', e => { if (e.target === reader) closeStory(); }
 // ---------- top bar: the selected section follows the one in view ----------
 const tabs = [...document.querySelectorAll('.tabs a')];
 const marks = ['stories', 'projects', 'education', 'skills'].map(id => document.getElementById(id));
+const bar = document.querySelector('.topbar');
+// a tab the visitor picks stays selected until they scroll the page themselves
+let chosen = null;
 function current() {
-  // Projects and Education sit side by side; when two sections start level, the first one is the one in view
-  let id = null, at = -Infinity;
-  marks.forEach(m => { const t = m.getBoundingClientRect().top; if (t < innerHeight * 0.4 && t > at + 1) { id = m.id; at = t; } });
-  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) id = marks[marks.length - 1].id;
+  let id = chosen;
+  if (!id) {
+    // a section is in view once its top passes a line just under the top bar; the line is fixed, not a share of the
+    // window, so a tall screen doesn't reach ahead to the next section.
+    // Projects and Education sit side by side; when two sections start level, the first one is the one in view
+    const under = bar.getBoundingClientRect().bottom, line = under + 120;
+    let at = -Infinity;
+    marks.forEach(m => { const t = m.getBoundingClientRect().top; if (t < line && t > at + 1) { id = m.id; at = t; } });
+    // the last section can be too short to reach the line, so at the bottom of the page it takes over, unless the
+    // section above it still starts in view (on a very tall screen the bottom comes before the later sections reach the top)
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2 && !(id && at >= under - 1)) id = marks[marks.length - 1].id;
+  }
   tabs.forEach(t => t.setAttribute('aria-current', t.dataset.tab === id));
 }
+tabs.forEach(t => t.addEventListener('click', () => { chosen = t.dataset.tab; current(); }));
+['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(type => addEventListener(type, () => { chosen = null; }, { passive: true }));
 addEventListener('scroll', current, { passive: true });
 current();
 
