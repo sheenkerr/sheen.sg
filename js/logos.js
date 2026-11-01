@@ -1,4 +1,4 @@
-// Shared logo lookup for skill tiles and story details.
+// Shared logo lookup for project write-ups and story details.
 window.LOGOS = (() => {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // Devicon 2.16.0's marks, copied into images/devicon so the page needs no CDN
@@ -49,7 +49,7 @@ window.LOGOS = (() => {
     TOTP: ['M12 21a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM12 10.5V14l2.5 1.5M10 3h4M12 3v4', '#dc2626'],
     'OpenAI-compatible APIs': ['M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0zM12 16v5', '#10a37f'],
   };
-  // stories reuse the same logos; a few stack names differ from the Skills list
+  // Normalize alternate names used in project and story stacks.
   const SAME = { 'Google Cloud Run': 'Cloud Run', 'Django Admin': 'Django' };
   // single-colour marks in dark ink; a page with a dark theme turns these white (class "ink"), as their brands' reverse logos do
   const INK = ['Django'];

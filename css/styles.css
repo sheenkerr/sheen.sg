@@ -93,9 +93,9 @@
     --ink-filter: brightness(0) invert(1);
     color-scheme: dark;
   }
-  :root[data-theme="dark"] .cover.proj { --cv: var(--pd); }
+  :root[data-theme="dark"] :is(.cover.proj, .project-feature, .project-small) { --cv: var(--pd); }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .cover.proj { --cv: var(--pd); }
+    :root:not([data-theme="light"]) :is(.cover.proj, .project-feature, .project-small) { --cv: var(--pd); }
   }
   @media (prefers-reduced-transparency: reduce) { :root { --glass: var(--card); } }
   * { box-sizing: border-box; }
@@ -186,7 +186,7 @@
      Each chapter widget reads down a line in its own colour, newest at the top. A step still going has a filled dot,
      and dates always take the chapter's colour so they're the first thing to find. */
   .work { --wbg: var(--work-soft); --rail: var(--work-ink); }
-  .projects { --wbg: var(--proj-well, var(--card)); --rail: var(--proj-ink); }
+  .projects { --wbg: var(--proj-well, var(--proj-soft)); --rail: var(--proj-ink); }
   .edu { --wbg: var(--study-soft); --rail: var(--study-ink); }
   .rail { list-style: none; margin: 0; padding: 0; }
   .rail > li { position: relative; padding: 0 0 20px 28px; }
@@ -205,43 +205,97 @@
   .jobs .org.sq { width: 56px; height: 56px; border-radius: 13px; }
   .jobs > li > :not(.org) { grid-column: 1; }
 
-  /* projects: a shelf of covers under one pink timeline, oldest first; arrows appear when they don't all fit */
-  .shelf-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-  .shelf-head .w-title { margin: 0; }
-  .shelf-nav { display: flex; gap: 8px; }
-  .shelf-nav button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; background: color-mix(in srgb, var(--label) 8%, transparent); color: var(--label); }
-  .shelf-nav button:hover:not(:disabled) { background: color-mix(in srgb, var(--label) 14%, transparent); }
-  .shelf-nav button:disabled { opacity: .35; cursor: default; }
-  .shelf-nav svg { width: 16px; height: 16px; }
-  .shelf { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 42px) / 4); gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 22px; margin: 0 -22px -6px; padding: 4px 22px 10px; scrollbar-width: none; }
-  .shelf::-webkit-scrollbar { display: none; }
-  /* while a mouse drags it, the shelf follows the pointer freely and snaps to a card again on release */
-  .shelf.dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
-  .shelf.dragging .press { cursor: grabbing; }
-  .proj-item { display: grid; grid-template-rows: auto 1fr; gap: 10px; scroll-snap-align: start; }
-  .tick { position: relative; margin: 0; padding-top: 20px; }
-  .tick::before { content: ""; position: absolute; top: 5px; left: 6px; right: -14px; height: 2px; background: color-mix(in srgb, var(--rail) 35%, transparent); }
-  .tick::after { content: ""; position: absolute; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--rail); background: var(--wbg); }
-  .proj-item:last-child .tick::before { display: none; }
-  /* projects from the same semester: the first keeps its dot and date, a solid bar runs from that dot across every card
-     that shares them, and the usual thin line carries on to the next semester. The repeated date stays for screen readers. */
-  .tick.span::before, .tick.cont::before { top: 3px; height: 6px; border-radius: 0 3px 3px 0; }
-  .tick.span::before { background: var(--rail); border-radius: 3px 0 0 3px; }
-  .tick.cont.span::before { border-radius: 0; }
-  .tick.cont::before {
-    left: 0;
-    background: linear-gradient(var(--rail), var(--rail)) left / calc(100% - 14px) 100% no-repeat,
-      linear-gradient(color-mix(in srgb, var(--rail) 35%, transparent), color-mix(in srgb, var(--rail) 35%, transparent)) right / 14px 2px no-repeat;
+  /* ---------- projects: the contribution and result stay visible; the full write-up expands below ---------- */
+  .projects-head { margin-bottom: 22px; }
+  .projects-head .w-title { margin-bottom: 8px; color: var(--proj-ink); }
+  .projects-head > p { margin: 0; color: var(--heading); font-family: var(--display); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; }
+  .project-features { display: grid; gap: 16px; }
+  /* every project keeps the colour its cover had: the diagram panel and the small cards' icon wear it, in its ink, in both themes */
+  .project-feature, .project-small { --cv: var(--pc); }
+  .project-feature { position: relative; min-width: 0; padding: 24px; border-radius: 22px; background: var(--raised); box-shadow: var(--lift); transition: transform .18s ease, box-shadow .18s ease; }
+  .project-main { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+  .project-copy { min-width: 0; }
+  .project-meta { display: block; margin: 0 0 8px; color: var(--secondary); font-size: 0.8125rem; }
+  .project-feature h3 { margin: 0; color: var(--heading); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; }
+  .project-role { margin: 8px 0 12px; color: var(--proj-ink); font-size: 0.875rem; font-weight: 700; }
+  .project-summary { margin: 0; font-size: 0.9375rem; }
+  .project-result { margin: 14px 0 0; font-size: 0.9375rem; }
+  .project-stack { display: flex; flex-wrap: wrap; gap: 8px 16px; list-style: none; margin: 16px 0 8px; padding: 0; color: var(--secondary); font-size: 0.8125rem; }
+  /* each technology wears the same mark it has in the project's page, a size down */
+  .project-stack li { display: inline-flex; align-items: center; gap: 6px; }
+  .project-stack img, .project-stack .glyph, .project-stack .mono { flex: none; width: 18px; height: 18px; }
+  .project-stack img { object-fit: contain; }
+  .project-stack .mono { display: grid; place-items: center; width: auto; min-width: 18px; padding: 0 3px; border-radius: 4px; background: var(--b); color: var(--f); font-size: 0.5625rem; font-weight: 800; }
+  .project-repo { position: relative; z-index: 1; gap: 7px; }
+  .project-visual { min-width: 0; padding: 20px; border-radius: 18px; background: var(--cv); color: var(--pi); }
+  .visual-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; margin-bottom: 12px; }
+  .project-visual .rmark { flex: none; width: 48px; height: 48px; object-fit: contain; }
+  .visual-label { margin: 0; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  /* the architecture diagrams: every step is the same left-aligned box, joined to the one before it by a line. A fork splits
+     the line across the steps that run side by side, and the step after a fork joins them again. A filled step is the part I
+     built, where only part of it was mine. */
+  .flow { --wire: color-mix(in srgb, currentColor 55%, transparent); display: grid; }
+  .flow > * + * { margin-top: 18px; }
+  .flow .node { position: relative; min-width: 0; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, .6); font-size: 0.875rem; font-weight: 600; line-height: 1.3; }
+  .flow .node small { display: block; margin-top: 2px; color: color-mix(in srgb, currentColor 78%, transparent); font-size: 0.75rem; font-weight: 400; }
+  .flow .node.mine { background: var(--pi); color: var(--cv); }
+  .flow > .node + .node::before, .fork::before, .fork + .node::before { content: ""; position: absolute; top: -18px; left: 50%; height: 18px; border-left: 1.5px solid var(--wire); }
+  .fork { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
+  /* a fork of short names sizes each box to its name, a little tighter, so "Collaboration" fits on a phone */
+  .fork.fit { grid-auto-columns: auto; }
+  .fork.fit .node { padding-inline: 8px; font-size: 0.8125rem; white-space: nowrap; }
+  .fork::before, .fork + .node::before { height: 9px; }
+  .fork + .node::before { top: -9px; }
+  .fork .node { padding: 9px 10px; }
+  .fork .node small { white-space: nowrap; }
+  /* each step in a fork draws its own drop and its share of the bar, so the bar runs from the first one's middle to the last's */
+  .fork > .node::before { content: ""; position: absolute; top: -9px; left: 50%; height: 9px; border-left: 1.5px solid var(--wire); }
+  .fork > .node::after { content: ""; position: absolute; top: -9px; left: -4px; right: -4px; border-top: 1.5px solid var(--wire); }
+  .fork > .node:first-child::after { left: 50%; }
+  .fork > .node:last-child::after { right: 50%; }
+  .fork:has(+ .node)::after { content: ""; position: absolute; top: 100%; left: calc(25% - 2px); right: calc(25% - 2px); height: 9px; border: 1.5px solid var(--wire); border-top: 0; }
+  .visual-note { margin: 12px 0 0; font-size: 0.75rem; }
+  .project-stat { margin: 0; font-family: var(--display); font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.05em; line-height: 1.1; }
+  .stat-context { margin: 8px 0 18px; font-size: 0.875rem; }
+  /* the soak test on one 14-hour axis: the line turns solid where order history starts timing out, and the memory under it
+     grows from 0.1 GB to 2.1 GB. Only the two ends were measured, so the wedge says "it grew", not how it curved. */
+  .soak { --at: 32.14%; margin-top: 4px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent); font-size: 0.8125rem; }
+  .soak-event { margin: 0 0 8px; padding-left: calc(var(--at) - 7px); font-weight: 700; line-height: 1.3; }
+  .soak-track { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in srgb, currentColor 30%, transparent) var(--at), currentColor var(--at)); }
+  .soak-track i { position: absolute; top: 50%; left: var(--at); width: 16px; height: 16px; border: 3px solid currentColor; border-radius: 50%; background: var(--cv); translate: -50% -50%; }
+  .soak-track i::after { content: ""; position: absolute; top: 13px; left: 50%; height: 44px; border-left: 1.5px dashed color-mix(in srgb, currentColor 60%, transparent); }
+  .soak-wedge { height: 44px; margin-top: 6px; background: color-mix(in srgb, currentColor 35%, transparent); clip-path: polygon(0 95%, 100% 0, 100% 100%, 0 100%); }
+  .soak-scale { display: flex; justify-content: space-between; align-items: end; gap: 8px; margin-top: 6px; font-size: 0.75rem; }
+  .soak-scale span:nth-child(2) { opacity: .85; text-align: center; }
+  .soak-scale span:last-child { text-align: right; }
+  .soak-scale b { display: block; }
+  .soak-note { margin: 10px 0 0; }
+  /* the whole card opens the project's page, as a smaller project's card does: the button stretches over the card, and only
+     the code link sits above it. It lifts the same way under the pointer, and the focus ring goes round the whole card. */
+  .project-feature:has(.project-open:hover) { transform: translateY(-2px); box-shadow: var(--lift-hover); }
+  .project-feature:has(.project-open:active) { transform: scale(.99); }
+  @media (prefers-reduced-motion: reduce) { .project-feature { transition: none; } .project-feature:has(.project-open:hover), .project-feature:has(.project-open:active) { transform: none; } }
+  .project-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
+  .project-open { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none; color: var(--proj-ink); font: inherit; font-size: 0.9375rem; font-weight: 700; cursor: pointer; }
+  .project-open::after { content: ""; position: absolute; inset: 0; border-radius: 22px; }
+  .project-open:focus-visible { outline: none; }
+  .project-open:focus-visible::after { outline: 3px solid var(--heading); outline-offset: 3px; }
+  .more-projects-h { margin: 26px 0 14px; color: var(--heading); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; }
+  .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .project-small { display: flex; flex-direction: column; min-width: 0; padding: 18px; border-radius: 18px; background: var(--raised); }
+  .project-small-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; margin-bottom: 10px; }
+  .project-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--cv); color: var(--pi); }
+  .project-icon .rmark { width: 36px; height: 36px; object-fit: contain; }
+  .project-small-title { display: block; color: var(--heading); font-family: var(--display); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.25; }
+  .project-small .project-summary { margin-bottom: 16px; color: var(--secondary); }
+  .project-more { display: flex; align-items: center; gap: 8px; margin-top: auto; color: var(--proj-ink); font-size: 0.875rem; font-weight: 700; }
+  /* side by side, both columns get too narrow for a fork of three below about 900px, so the diagram goes under the copy */
+  @media (max-width: 900px) { .project-main { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+  @media (max-width: 700px) { .project-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (pointer: coarse) {
+    .project-repo { min-height: 44px; }
+    .project-open { min-height: 44px; }
   }
-  .tick.cont.span::before { background: var(--rail); }
-  .proj-item:last-child .tick.cont::before { display: block; right: 0; background: var(--rail); }
-  .tick.cont::after { display: none; }
-  .tick.cont .when { color: transparent; }
-  /* when the shelf shows only a card or two, the first of the pair can be scrolled away, so every card keeps its date */
-  @media (max-width: 1023px) { .tick.cont .when { color: var(--rail); } }
-  .shelf .story { border-radius: 20px; }
-  /* a project card's line reads like a story card's outcome: bold, in the main text colour */
-  .shelf .story .sum { color: var(--label); font-size: 0.9375rem; font-weight: 600; line-height: 1.35; }
 
   .edu li { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: 14px; }
   .edu .crest { grid-column: 2; grid-row: 1 / span 4; justify-self: end; width: 104px; height: 48px; object-fit: contain; object-position: right center; }
@@ -287,11 +341,9 @@
      a row unless a title runs to three lines */
   .story:not(.feat) .cover { flex: none; min-height: 196px; padding-top: 108px; }
   .story:not(.feat) .cover svg.art { inset: 14px 14px auto auto; width: calc(100% - 28px); height: 84px; opacity: .7; }
-  .shelf .story .cover { min-height: 168px; padding-top: 104px; }
-  .shelf .story .cover svg.art { height: 78px; }
   /* a repo's own mark sits where a drawing would, top right */
   .cover .rmark { position: absolute; top: 16px; right: 16px; width: 76px; height: 76px; object-fit: contain; }
-  .cover .rmark.stencil { background: currentColor; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+  .rmark.stencil { background: currentColor; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
   .reader .cover .rmark { top: 28px; right: 28px; width: clamp(110px, 22vw, 160px); height: clamp(110px, 22vw, 160px); }
   .story:not(.feat) .foot { flex: 1; align-content: start; }
   /* a story across products wears a ribbon of each, as on Bento */
@@ -366,35 +418,6 @@
   @keyframes bump { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
   @media (prefers-reduced-motion: reduce) { .toy-bump .toy-meter { animation: none; } .toy-meter i { transition: none; } }
 
-  /* ---------- skills: app icons in folders, named underneath the way a home screen names them ---------- */
-  .sk-group + .sk-group { margin-top: 18px; }
-  .sk-group h3 { margin: 0 0 8px; color: var(--secondary); font-family: inherit; font-size: 0.875rem; font-weight: 700; }
-  .folders { display: flex; flex-wrap: wrap; gap: 12px; }
-  .folder { padding: 10px 8px 6px; border-radius: 22px; background: color-mix(in srgb, var(--label) 5%, transparent); }
-  .folder-h { display: flex; align-items: center; gap: 6px; margin: 0 8px 6px; font-size: 0.8125rem; font-weight: 700; }
-  .folder-h img { width: 18px; height: 18px; border-radius: 4px; }
-  .apps { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
-  .app { width: 80px; display: grid; justify-items: center; gap: 5px; padding: 4px 2px 6px; text-align: center; }
-  .icon { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 13px; background: var(--card); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); overflow: hidden; }
-  .icon img { width: 34px; height: 34px; object-fit: contain; }
-  .icon img[src$="celery.png"], .icon img[src$="celery.webp"] { width: 46px; }
-  /* marks that are already app squares fill the whole icon */
-  .icon img.fill { width: 100%; height: 100%; border-radius: 0; }
-  .icon .mono { display: grid; place-items: center; width: 100%; height: 100%; background: var(--b); color: var(--f); font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
-  .app .name { font-size: 0.75rem; font-weight: 600; line-height: 1.2; overflow-wrap: normal; }
-  /* a skill with work behind it can be pressed: it wears a count of the places it was used, and lime once it's picked */
-  button.app { position: relative; border: 0; border-radius: 16px; background: none; color: inherit; font: inherit; cursor: pointer; }
-  button.app:hover { background: color-mix(in srgb, var(--label) 7%, transparent); }
-  button.app[aria-pressed="true"] { background: var(--lime); color: #101418; }
-  .app .n { position: absolute; top: 0; right: 6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--label); color: var(--card); font: 700 0.6875rem/20px system-ui, sans-serif; text-align: center; }
-  /* where I used it: only the stories and projects that used the pressed skill, under its group, each with a lime edge */
-  .used { flex: 0 0 100%; padding: 14px; border-radius: 20px; background: var(--bg); }
-  .used-line { margin: 0 0 12px; font-weight: 600; }
-  .used-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
-  .used .press { display: block; height: 100%; padding: 10px 14px; border-radius: 12px; background: var(--raised); box-shadow: var(--lift), inset 4px 0 0 var(--lime); font-size: 0.9375rem; font-weight: 600; line-height: 1.3; }
-  .used .press:hover { box-shadow: var(--lift-hover), inset 4px 0 0 var(--lime); }
-  .used small { display: block; margin-top: 2px; color: var(--secondary); font-size: 0.8125rem; font-weight: 500; }
-
   /* ---------- contact ---------- */
   /* the page closes on me, as it opens: a soft lime in light mode; in dark mode a plain card with a lime title, like Hi */
   .contact { --wbg: var(--close); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
@@ -404,7 +427,7 @@
   /* LinkedIn and GitHub stay together, so on a narrow screen they wrap as a pair under the CV button */
   .contact .profiles { display: flex; gap: 8px 22px; }
 
-  /* chips for "Tools and skills", with the same marks as Skills */
+  /* technology chips shared by project write-ups and the story reader */
   .chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 8px 0 0; padding: 0; }
   .chips li { display: inline-flex; align-items: center; gap: 7px; background: var(--bg); border-radius: 999px; padding: 4px 12px; font-size: 0.9375rem; }
   .chips li:has(img, .mono, .glyph) { padding-left: 5px; }
@@ -466,7 +489,6 @@
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .n-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .story.feat { grid-row: auto; grid-column: 1 / -1; }
-    .shelf { grid-auto-columns: calc((100% - 14px) / 2.25); }
     /* the name and contact row scroll away; the sections stay pinned */
     .topbar { top: -50px; }
     .topbar .col { column-gap: 12px; }
@@ -493,9 +515,9 @@
     .n-head { padding: 14px 12px 16px; }
     .n-head .mark { width: 48px; height: 48px; border-radius: 12px; }
     .n-grid { grid-template-columns: minmax(0, 1fr); }
-    .shelf { grid-auto-columns: 78%; margin: 0 -20px -6px; padding: 4px 20px 10px; scroll-padding-inline: 20px; }
     .n-grid .s2 { grid-column: auto; }
-    .app { width: 74px; }
+    .project-feature { padding: 18px; }
+    .project-visual { padding: 16px; }
     .reader .cover { min-height: 280px; }
     .reader .body { padding: 22px 18px 40px; }
   }

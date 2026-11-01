@@ -10,7 +10,7 @@ window.ME = {
     { date: '2023-12', event: 'Winter campus, Korea University', c: 'chip-a' },
     { date: '2024-05', event: 'Distraction Dismantlers, NUS Orbital', c: 'chip-c' },
     { date: '2024-08', event: 'BizBook, NUS CS2103', c: 'chip-c' },
-    { date: '2025-01', event: 'SQLancer interface, NUS CS3213', c: 'chip-c' },
+    { date: '2025-01', event: 'SQLancer Interface, NUS CS3213', c: 'chip-c' },
     { date: '2025-08', event: 'PeerPrep, NUS CS3219', c: 'chip-c' },
     { date: '2026-01', event: 'Intern at Nested Technologies', c: 'chip-d' },
     { date: '2026-01', event: 'FlowFox, NUS CS5224', c: 'chip-c' },
@@ -175,6 +175,12 @@ window.ME = {
   projects: [
     {
       id: 'flowfox', title: 'FlowFox', product: 'NUS CS5224, Jan – May 2026', module: 'CS5224 Cloud Computing', metric: 'AWS deploys', c: 'chip-b',
+      feature: {
+        order: 1, role: 'AWS infrastructure & deployment',
+        summary: 'A workspace of productivity applets. I built the AWS deployment so the frontend and API could ship automatically.',
+        result: 'A push to main deploys the parts that changed and checks that the live site is running that commit.',
+        stack: ['AWS ECS', 'S3', 'CloudFront', 'GitHub Actions', 'DynamoDB'],
+      },
       summary: 'A drag-and-drop workspace of productivity applets, like one that maps a Google Drive folder into a mind map. I owned its AWS deployment.',
       problem: 'A team cloud computing project: the app had to run on AWS, and its frontend and API had to ship without anyone deploying by hand.',
       did: [
@@ -190,6 +196,12 @@ window.ME = {
     },
     {
       id: 'vault', title: 'Virtual Vault', product: 'NUS CS4218, Jan – May 2026', module: 'CS4218 Software Testing', metric: '14-hour soak test', c: 'chip-c',
+      feature: {
+        order: 3, role: 'Authentication testing & fixes',
+        summary: 'Testing a MERN e-commerce site from unit tests to sustained load. My authentication tests found 13 bugs, which I fixed.',
+        result: 'A long soak test exposed order-history timeouts and growing memory use that short tests missed.',
+        stack: ['Jest', 'Playwright', 'k6', 'JavaScript'],
+      },
       summary: 'Testing a MERN e-commerce site at every level, from unit tests to a 14-hour soak test. I owned authentication.',
       problem: 'Virtual Vault is an online shop given to the class to test, finding and fixing its bugs along the way. Each of us owned part of it; mine was sign-up, login and access control, backend and frontend.',
       did: [
@@ -205,6 +217,12 @@ window.ME = {
     },
     {
       id: 'peerprep', title: 'PeerPrep', product: 'NUS CS3219, Aug – Dec 2025', module: 'CS3219 Software Engineering Principles and Patterns', metric: 'gateway and deploys', c: 'chip-b',
+      feature: {
+        order: 2, role: 'API gateway & cloud deployment',
+        summary: 'A platform for practising coding interviews in pairs. I gave eight services one authenticated entry point and a repeatable deployment.',
+        result: 'Services deploy on merge, with session handling and live collaboration routed through the gateway.',
+        stack: ['FastAPI', 'Redis', 'Google Cloud Run', 'Docker'],
+      },
       summary: 'A microservices platform for practising coding interviews in pairs. I owned the gateway and the cloud deployment.',
       problem: 'Eight services, from matching to live code collaboration, needed one front door that handled sign-in, and a repeatable way to ship.',
       did: [
@@ -219,7 +237,7 @@ window.ME = {
       repo: 'https://github.com/CS3219-AY2526Sem1/cs3219-ay2526s1-project-g12',
     },
     {
-      id: 'sqlancer', title: 'SQLancer interface', product: 'NUS CS3213, Jan – May 2025', module: 'CS3213 Foundations of Software Engineering', metric: 'React + Vitest', c: 'chip-c',
+      id: 'sqlancer', title: 'SQLancer Interface', product: 'NUS CS3213, Jan – May 2025', module: 'CS3213 Foundations of Software Engineering', metric: 'React + Vitest', c: 'chip-c',
       summary: 'A web interface for SQLancer, a command-line tool that finds bugs in database systems.',
       problem: 'SQLancer only ran from the command line, which made its results hard to follow and share.',
       did: [
@@ -267,11 +285,4 @@ window.ME = {
     { school: 'Korea University', logo: 'images/schools/korea.webp', programme: 'International Winter Campus', award: 'Statistics and Probability A+', from: '2023-12', to: '2024-01' },
     { school: 'Ngee Ann Polytechnic', logo: 'images/schools/ngeeann.webp', award: 'Diploma with Merit, Financial Informatics', from: '2018-04', to: '2021-04' },
   ],
-  skills: {
-    'Languages': { c: 'chip-a', items: ['Python', 'SQL', 'TypeScript', 'JavaScript', 'Java', 'R'] },
-    'Backend & Data': { c: 'chip-a', items: ['Django', 'FastAPI', 'Celery', 'Stripe', 'ASP.NET Core', 'PostgreSQL', 'Redis', 'SQL Server', 'Firebase'] },
-    'DevOps': { c: 'chip-b', items: ['AWS ECS', 'EC2', 'S3', 'CloudFront', 'Route 53', 'Parameter Store', 'Cloud Run', 'Pub/Sub', 'Docker', 'GitHub Actions'] },
-    'Frontend & Apps': { c: 'chip-c', items: ['React', 'React Native', 'Material UI', 'Vitest', 'JUnit', 'Figma'] },
-    'Data Science & Automation': { c: null, items: ['PyTorch', 'TensorFlow', 'Tableau', 'UiPath'] },
-  },
 };

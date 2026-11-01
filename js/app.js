@@ -1,5 +1,5 @@
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const { DI, MONO, src, logo } = LOGOS;
+const { logo } = LOGOS;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 function yearMonth(date) {
   return `${MONTHS[Number(date.slice(5, 7)) - 1]} ${date.slice(0, 4)}`;
@@ -59,18 +59,20 @@ function art(kind) {
 // (cover, deep title, and a little deeper cover for dark mode)
 // Every project colour is one used nowhere else on the site: the pale tints all sit close to a story cover or a widget
 // colour, so these are stronger, each at least 16 ΔE from every other colour in the site and 21 from each other.
-// FlowFox keeps the orange of its own app and Virtual Vault the green of its wordmark, both made richer; BizBook's
-// indigo is the one mid-tone, since the paler blues and violets all belong to Work, Education or the Nested story.
+// FlowFox keeps the orange of its own app, made richer; BizBook's indigo is the one mid-tone, since the paler blues and
+// violets all belong to Work, Education or the Nested story. Virtual Vault keeps the green of its wordmark, but a pale
+// green sat on top of the site's lime and Distraction Dismantlers' mint, so it's a deep vault green with pale ink instead.
 const PROJECT = {
   peerprep: ['#ffc98a', '#5a3500', '#ecb677'], sqlancer: ['#f0b6e0', '#6b1f5c', '#dca3cd'],
   bizbook: ['#7f86d9', '#10144f', '#7378c8'], orbital: ['#9fdfb8', '#0d4a2c', '#8fcfa8'],
-  flowfox: ['#ffb39c', '#7a2a0c', '#eda18a'], vault: ['#d6e895', '#3b4a0a', '#c3d684'],
+  flowfox: ['#ffb39c', '#7a2a0c', '#eda18a'], vault: ['#1f5f3f', '#eef7e4', '#236845'],
 };
 // a project whose repo has a mark of its own wears it in place of a drawing; the one-colour marks (FlowFox's fox,
 // Virtual Vault's cart, cut from the left of its wordmark) are stencils in the cover's ink. PeerPrep's only mark is its
 // name set in IBM Plex Serif, which the cover's title already says, so it keeps its drawing.
 const REPO_MARK = { sqlancer: 'sqlancer.webp', bizbook: 'bizbook.webp', orbital: 'distraction-dismantlers.webp', flowfox: 'flowfox.webp', vault: 'virtual-vault.webp' };
 const STENCIL = ['flowfox', 'vault'];
+const tint = id => { const [pc, pi, pd] = PROJECT[id]; return `--pc:${pc};--pi:${pi};--pd:${pd}`; };
 const repoMark = id => STENCIL.includes(id)
   ? `<span class="rmark stencil" style="--m:url(../images/projects/${REPO_MARK[id]})" aria-hidden="true"></span>`
   : `<img class="rmark" src="images/projects/${REPO_MARK[id]}" alt="" loading="lazy">`;
@@ -86,7 +88,7 @@ function cover(x, kicker) {
   const cls = coverKind(x);
   let ribbon = '', marks = '', style = '';
   if (cls === 'company') marks = '<img class="pm" src="images/orgs/nested.svg" width="26" height="26" alt="">';
-  else if (cls === 'proj') { const [pc, pi, pd] = PROJECT[x.id]; style = ` style="--pc:${pc};--pi:${pi};--pd:${pd}"`; }
+  else if (cls === 'proj') style = ` style="${tint(x.id)}"`;
   else {
     const ps = productsOf(x);
     marks = ps.map(p => prodMark(p, 'pm')).join('');
@@ -188,132 +190,71 @@ guardRun.querySelector('.toy-go').classList.add('btn');
 guardRun.querySelector('.toy-reset').classList.add('btn', 'soft');
 guardRun.querySelector('.toy-actions').insertAdjacentHTML('beforeend', '<button class="link" type="button" data-id="abuse">Read the story</button>');
 
-// ---------- chapter widgets ----------
-// the shelf runs oldest to newest along one line, each project with its dates on it; its code is linked from the full story.
-// Projects from the same semester share one dot and one date, with a solid bar running across all of them
-// ("span" starts or carries the bar on to the next card, "cont" is a card the bar arrived from)
-const shelfEl = document.getElementById('shelf'), shelfNav = document.getElementById('shelfNav'), [prevProj, nextProj] = shelfNav.querySelectorAll('button');
+// ---------- projects: featured write-ups, followed by the rest in a compact grid ----------
+const featuredProjects = projects.filter(x => x.feature).sort((a, b) => a.feature.order - b.feature.order);
+const otherProjects = projects.filter(x => !x.feature);
+// the cards give only the semester; the module code and name wait in the project's own page
 const term = x => x.product.split(', ').pop();
-shelfEl.innerHTML = [...projects].reverse().map((x, i, xs) => `
-  <div class="proj-item"><p class="tick${xs[i - 1] && term(xs[i - 1]) === term(x) ? ' cont' : ''}${xs[i + 1] && term(xs[i + 1]) === term(x) ? ' span' : ''}"><span class="when">${esc(term(x))}</span></p>
-  <button class="story press" type="button" data-id="${x.id}" aria-label="Read about ${esc(x.title)}">${cover(x, '')}<span class="foot"><span class="sum">${esc(x.summary)}</span></span></button></div>`).join('');
-function shelfEdges() {
-  const max = shelfEl.scrollWidth - shelfEl.clientWidth;
-  shelfNav.hidden = max <= 4;
-  prevProj.disabled = shelfEl.scrollLeft <= 4;
-  nextProj.disabled = shelfEl.scrollLeft >= max - 4;
-}
-shelfNav.addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  // move by all the cards in view but one, so the last one seen stays on screen
-  const card = shelfEl.querySelector('.proj-item').offsetWidth + 14, step = card * Math.max(1, Math.floor(shelfEl.clientWidth / card) - 1);
-  shelfEl.scrollBy({ left: b.dataset.dir * step, behavior: still ? 'auto' : 'smooth' });
-});
-shelfEl.addEventListener('scroll', shelfEdges, { passive: true });
-// a mouse can drag the shelf sideways, the way a finger swipes it; letting go after a drag doesn't open the card underneath
-let drag = null, dragged = false;
-shelfEl.addEventListener('pointerdown', e => {
-  if (e.pointerType === 'mouse' && e.button === 0) drag = { x: e.clientX, left: shelfEl.scrollLeft, moved: false };
-});
-addEventListener('pointermove', e => {
-  if (!drag) return;
-  const dx = e.clientX - drag.x;
-  if (!drag.moved && Math.abs(dx) < 6) return;
-  drag.moved = true;
-  shelfEl.classList.add('dragging');
-  shelfEl.scrollLeft = drag.left - dx;
-});
-addEventListener('pointerup', () => {
-  if (!drag) return;
-  if (drag.moved) { dragged = true; setTimeout(() => { dragged = false; }); shelfEl.classList.remove('dragging'); }
-  drag = null;
-});
-shelfEl.addEventListener('click', e => { if (dragged) { e.preventDefault(); e.stopPropagation(); } }, true);
-shelfEl.addEventListener('dragstart', e => e.preventDefault());
-addEventListener('resize', shelfEdges);
-// the line runs oldest to newest, so it opens at the newest end
-shelfEl.scrollLeft = shelfEl.scrollWidth;
-shelfEdges();
+// each diagram is the project's cover now: its own colour, with its mark top right where the old cover wore it
+const visualHead = (id, label) => `<div class="visual-head"><p class="visual-label">${label}</p>${REPO_MARK[id] ? repoMark(id) : ''}</div>`;
+const projectVisuals = {
+  flowfox: `<div class="project-visual" role="group" aria-label="FlowFox deployment architecture">
+    ${visualHead('flowfox', 'From commit to live')}
+    <div class="flow">
+      <div class="node">Push to main</div>
+      <div class="node">GitHub Actions<small>Builds only what changed, signs in to AWS with OIDC</small></div>
+      <div class="fork"><div class="node">Frontend<small>S3 → CloudFront</small></div><div class="node">API<small>ECR → Fargate</small></div></div>
+      <div class="node">Live check<small>The site is serving this commit</small></div>
+    </div>
+  </div>`,
+  peerprep: `<div class="project-visual" role="group" aria-label="PeerPrep request architecture">
+    ${visualHead('peerprep', 'One front door')}
+    <div class="flow">
+      <div class="node">Browser<small>HTTP requests and WebSockets</small></div>
+      <div class="node mine">FastAPI gateway<small>Redis sessions, service registry</small></div>
+      <div class="fork fit"><div class="node">User</div><div class="node">Matching</div><div class="node">Collaboration</div></div>
+    </div><p class="visual-note">Filled: the part I built. Calls only reach live, registered services.</p>
+  </div>`,
+  vault: `<div class="project-visual" role="group" aria-label="Virtual Vault soak test findings">
+    ${visualHead('vault', 'Beyond a short test run')}
+    <p class="project-stat">14 hours</p><p class="stat-context">100 simulated shoppers<br>Almost 2 million requests</p>
+    <div class="soak">
+      <p class="soak-event">Order history starts timing out at 4½ h</p>
+      <div class="soak-track" aria-hidden="true"><i></i></div>
+      <div class="soak-wedge" aria-hidden="true"></div>
+      <div class="soak-scale"><span><b>0 h</b>0.1 GB</span><span>Backend memory</span><span><b>14 h</b>2.1 GB</span></div>
+      <p class="soak-note">Memory climbed the whole run and never settled back.</p>
+    </div>
+  </div>`,
+};
+document.getElementById('projectFeatures').innerHTML = featuredProjects.map(x => `
+  <article class="project-feature" data-project="${x.id}" style="${tint(x.id)}" aria-labelledby="${x.id}-h">
+    <div class="project-main">
+      <div class="project-copy">
+        <p class="project-meta">${esc(term(x))}</p><h3 id="${x.id}-h">${esc(x.title)}</h3>
+        <p class="project-role">My role: ${esc(x.feature.role)}</p><p class="project-summary">${esc(x.feature.summary)}</p>
+        <p class="project-result"><b>${x.id === 'vault' ? 'The finding' : 'The result'}:</b> ${esc(x.feature.result)}</p>
+        <ul class="project-stack" aria-label="Selected technologies">${x.feature.stack.map(s => `<li>${logo(s)}${esc(s)}</li>`).join('')}</ul>
+        <div class="project-actions">
+          <button class="project-open" type="button" data-id="${x.id}">Explore project<span class="sr"> ${esc(x.title)}</span> <span aria-hidden="true">→</span></button>
+          <a class="link project-repo" href="${esc(x.repo)}" target="_blank" rel="noopener" aria-label="View ${esc(x.title)} code on GitHub">${GH}View code</a>
+        </div>
+      </div>${projectVisuals[x.id] || ''}
+    </div>
+  </article>`).join('');
+document.getElementById('projectGrid').innerHTML = otherProjects.map(x => `
+  <button class="project-small press" type="button" data-id="${x.id}" style="${tint(x.id)}" aria-label="Read about ${esc(x.title)}">
+    <span class="project-small-head"><span><span class="project-meta">${esc(term(x))}</span><span class="project-small-title">${esc(x.title)}</span></span>
+    ${REPO_MARK[x.id] ? `<span class="project-icon">${repoMark(x.id)}</span>` : ''}</span>
+    <span class="project-summary">${esc(x.summary)}</span><span class="project-more">Explore project <span aria-hidden="true">→</span></span>
+  </button>`).join('');
+
+// ---------- education ----------
 document.getElementById('edu').innerHTML = ME.education.map(e => `
   <li><img class="crest" src="${esc(e.logo)}" data-dark="${esc(e.logo.replace(/(\.[^.]+)$/, '-dark$1'))}" alt="" loading="lazy">
   <span class="when"><time datetime="${e.from}">${yearMonth(e.from)}</time> – <time datetime="${e.to}">${yearMonth(e.to)}</time></span>
   <b>${esc(e.school)}${e.programme ? `, ${esc(e.programme)}` : ''}</b><span class="what">${esc(e.award)}</span>
-  ${e.merit ? `<span class="merit">Focus areas with Merit: ${e.merit.map(esc).join(' and ')}</span>` : ''}</li>`).join('');
-
-// ---------- skills: app icons in folders by platform or kind; anything not listed lands in "More" ----------
-const GROUPS = {
-  'Languages': [['', '', ['Python', 'SQL', 'TypeScript', 'JavaScript', 'Java', 'R']]],
-  'Backend & Data': [['Frameworks & Services', '', ['Django', 'FastAPI', 'Celery', 'Stripe', 'ASP.NET Core']], ['Databases', '', ['PostgreSQL', 'Redis', 'SQL Server', 'Firebase']]],
-  'DevOps': [['AWS', 'images/aws/aws-cloud.svg', ['AWS ECS', 'EC2', 'S3', 'CloudFront', 'Route 53', 'Parameter Store']], ['Google Cloud', `${DI}googlecloud-original.svg`, ['Cloud Run', 'Pub/Sub']], ['Containers & CI', '', ['Docker', 'GitHub Actions']]],
-  'Frontend & Apps': [['Frameworks', '', ['React', 'React Native', 'Material UI']], ['Testing & Design', '', ['Vitest', 'JUnit', 'Figma']]],
-  'Data Science & Automation': [['Machine Learning', '', ['PyTorch', 'TensorFlow']], ['Analytics & Automation', '', ['Tableau', 'UiPath']]],
-};
-function groupsOf(section, items) {
-  const gs = (GROUPS[section] || []).map(([l, m, ns]) => [l, m, ns.filter(s => items.includes(s))]).filter(g => g[2].length);
-  const left = items.filter(s => !gs.some(g => g[2].includes(s)));
-  return left.length ? [...gs, ['More', '', left]] : gs;
-}
-// AWS services, Stripe and React Native already come as app squares, so they fill the icon
-function appIcon(skill) {
-  const image = src(skill);
-  if (image) {
-    let className = '';
-    if (/^images\/aws\/|stripe\.svg$|react-native\.(?:png|webp)$/.test(image)) className = 'fill';
-    else if (skill === 'Django') className = 'ink';
-    return `<img${className ? ` class="${className}"` : ''} src="${image}" alt="" loading="lazy">`;
-  }
-  const [text, background, foreground] = MONO[skill] || [skill.slice(0, 2), '#101418', '#fff'];
-  return `<span class="mono" style="--b:${background};--f:${foreground}">${esc(text)}</span>`;
-}
-// Index each story once per skill, preserving the story/project order.
-const skillUsage = new Map();
-all.forEach(item => {
-  const skills = new Set(item.stack.map(skill => LOGOS.SAME[skill] || skill));
-  skills.forEach(skill => {
-    if (!skillUsage.has(skill)) skillUsage.set(skill, []);
-    skillUsage.get(skill).push(item);
-  });
-});
-function usedAt(skill) {
-  return skillUsage.get(skill) || [];
-}
-const appTile = s => {
-  const n = usedAt(s).length, inner = `<span class="icon" aria-hidden="true">${appIcon(s)}</span><span class="name">${esc(s)}</span>`;
-  return n ? `<li><button class="app" type="button" data-skill="${esc(s)}" aria-pressed="false" aria-controls="used">${inner}<b class="n" aria-hidden="true">${n}</b><span class="sr">, used in ${n === 1 ? 'one place' : `${n} places`}</span></button></li>`
-    : `<li class="app">${inner}</li>`;
-};
-const skEl = document.getElementById('sk');
-skEl.innerHTML = Object.entries(ME.skills).map(([g, v]) =>
-  `<div class="sk-group"><h3>${esc(g)}</h3><div class="folders">${groupsOf(g, v.items).map(([label, mark, names]) =>
-  `<div class="folder">${label ? `<p class="folder-h">${mark ? `<img src="${mark}" alt="" loading="lazy">` : ''}${esc(label)}</p>` : ''}<ul class="apps">${names.map(appTile).join('')}</ul></div>`).join('')}</div></div>`).join('');
-// the places that used it open straight under the pressed skill's folder, stories first, each opening its story.
-// Folders wrap, so the panel goes after the last folder on that folder's row and never splits a row.
-// Pressing the skill again closes them.
-const usedBox = document.createElement('div');
-usedBox.className = 'used'; usedBox.id = 'used'; usedBox.hidden = true;
-usedBox.innerHTML = '<p class="used-line" aria-live="polite"></p><ul class="used-list"></ul>';
-// it's on the page, hidden, from the start, so the skills' aria-controls always point at it
-skEl.append(usedBox);
-let usedFolder = null;
-function placeUsed() {
-  usedBox.remove();
-  const row = [...usedFolder.parentElement.children].filter(f => f.offsetTop === usedFolder.offsetTop);
-  row[row.length - 1].after(usedBox);
-}
-addEventListener('resize', () => { if (!usedBox.hidden) placeUsed(); });
-skEl.addEventListener('click', e => {
-  const b = e.target.closest('[data-skill]'); if (!b) return;
-  const on = b.getAttribute('aria-pressed') !== 'true';
-  skEl.querySelectorAll('[data-skill]').forEach(x => x.setAttribute('aria-pressed', String(on && x === b)));
-  usedBox.hidden = !on;
-  if (!on) return;
-  const s = b.dataset.skill, at = usedAt(s);
-  usedBox.querySelector('.used-line').textContent = `Used in ${at.length === 1 ? '1 place' : `${at.length} places`}`;
-  usedBox.querySelector('.used-list').innerHTML = at.map(x => `<li><button class="press" type="button" data-id="${x.id}">${esc(x.title)}
-    <small>${x.group === 'work' ? `Story from Nested${x.product === 'Nested' ? '' : `, ${esc(x.product)}`}` : esc(x.product)}</small></button></li>`).join('');
-  usedFolder = b.closest('.folder');
-  placeUsed();
-});
+  ${e.merit ? `<span class="merit">Focus Areas with Merit: ${e.merit.map(esc).join(' and ')}</span>` : ''}</li>`).join('');
 
 // ---------- covers draw themselves in the first time a widget comes into view ----------
 function prep(svg) {
@@ -332,9 +273,9 @@ const reader = document.getElementById('reader');
 const track = (path, title) => window.goatcounter?.count?.({ path, title, event: true });
 const chip = s =>`<li>${logo(s)}${esc(s)}</li>`;
 let fromEl = null;
-// previous and next follow the page: stories as today's stack lays them out, projects along the shelf, oldest first;
+// previous and next follow the page: stories as the stack lays them out, then featured projects and the rest;
 // the first has no previous and the last no next, so neither loops
-const order = { work: [pick, ...rest], proj: [...projects].reverse() };
+const order = { work: [pick, ...rest], proj: [...featuredProjects, ...otherProjects] };
 const chev = d => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function fill(x) {
   const list = order[x.group], i = list.indexOf(x), prev = list[i - 1], next = list[i + 1];
@@ -369,12 +310,14 @@ function transition(update) {
   if (!document.startViewTransition || still) { update(); return Promise.resolve(); }
   return document.startViewTransition(update).finished;
 }
-// a widget with a cover morphs into the story; a text link just opens it
+// a widget with a cover morphs into the story; a text link just opens it.
+// A featured project's coloured diagram is its cover, so that is what grows into the page.
+const coverOf = el => el.querySelector('.cover') || el.closest('.project-feature')?.querySelector('.project-visual');
 function openStory(el) {
   const x = all.find(y => y.id === el.dataset.id); if (!x) return;
   if (el.closest('.n-grid:not(.open) .more')) return;
   fromEl = el;
-  const c = el.querySelector('.cover');
+  const c = coverOf(el);
   if (c) c.style.viewTransitionName = 'story-cover';
   transition(() => {
     if (c) c.style.viewTransitionName = '';
@@ -383,7 +326,7 @@ function openStory(el) {
   }).finally(() => { const rc = reader.querySelector('.cover'); if (rc) rc.style.viewTransitionName = ''; reader.querySelector('.close').focus(); });
 }
 function closeStory() {
-  const rc = reader.querySelector('.cover'), c = fromEl && fromEl.querySelector('.cover');
+  const rc = reader.querySelector('.cover'), c = fromEl && coverOf(fromEl);
   const morph = c && reader.scrollTop < 200;
   if (morph) rc.style.viewTransitionName = 'story-cover';
   transition(() => {
@@ -405,7 +348,7 @@ reader.addEventListener('click', e => { if (e.target === reader) closeStory(); }
 
 // ---------- top bar: the selected section follows the one in view ----------
 const tabs = [...document.querySelectorAll('.tabs a')];
-const marks = ['stories', 'projects', 'education', 'skills'].map(id => document.getElementById(id));
+const marks = tabs.map(tab => document.getElementById(tab.dataset.tab));
 const bar = document.querySelector('.topbar');
 // a tab the visitor picks stays selected until they scroll the page themselves
 let chosen = null;
@@ -414,7 +357,7 @@ function current() {
   if (!id) {
     // a section is in view once its top passes a line just under the top bar; the line is fixed, not a share of the
     // window, so a tall screen doesn't reach ahead to the next section.
-    // Projects and Education sit side by side; when two sections start level, the first one is the one in view
+    // When two sections start level, the first one is the one in view.
     const under = bar.getBoundingClientRect().bottom, line = under + 120;
     let at = -Infinity;
     marks.forEach(m => { const t = m.getBoundingClientRect().top; if (t < line && t > at + 1) { id = m.id; at = t; } });
