@@ -47,6 +47,8 @@
   fetch('data/usage.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(show).catch(() => {
     section.querySelectorAll(':scope > :not(.usage-head)').forEach(e => e.remove());
     section.append(el('p', { class: 'usage-empty' }, 'The usage figures couldn’t be loaded just now.'));
+    // the pill keeps its generic label from index.html and still links to the section
+    $('burn').title = 'The token usage figures couldn’t be loaded just now.';
   });
 
   function show(data) {
@@ -55,6 +57,15 @@
     // updatedAt is written in Singapore time, e.g. 2026-11-02T14:15+08:00; only its day is shown
     const updated = data.updatedAt.slice(0, 10);
     $('usageUpdated').replaceChildren('Updated ', el('time', { datetime: updated }, dayName(updated)), '.');
+
+    // ---------- the pill beside the greeting: every token of the last 30 days ----------
+    // index.html shows it from the first paint with a label of about the same width, so the count replaces that label
+    // without moving the line; the exact count and its days go in the title
+    const last30 = data.daily.slice(-30);
+    const recent = last30.reduce((sum, day) => sum + tools.reduce((a, tool) => a + day[tool.id].reduce((x, y) => x + y, 0), 0), 0);
+    const burn = $('burn');
+    $('burnText').replaceChildren(el('b', {}, short(recent)), ' tokens', el('span', { 'aria-hidden': 'true' }, ' · past 30d'), el('span', { class: 'sr' }, ' in the past 30 days'));
+    if (last30.length) burn.title = `${exact(recent)} tokens from ${dayName(last30[0].day)} to ${dayName(last30[last30.length - 1].day)}. See them by day.`;
 
 
     // ---------- the daily chart ----------
@@ -286,14 +297,8 @@
     }
     draw();
 
-    // ---------- the pill beside the greeting: every token of the last 30 days ----------
-    // It links to the section like the Tokens tab, and sets the chart to those same days, all tools and all tokens,
+    // The pill links to the section like the Tokens tab, and sets the chart to its same days, all tools and all tokens,
     // so the total there matches the pill.
-    const recent = data.daily.slice(-30).reduce((sum, day) => sum + tools.reduce((a, tool) => a + day[tool.id].reduce((x, y) => x + y, 0), 0), 0);
-    const burn = $('burn');
-    $('burnText').replaceChildren(el('b', {}, short(recent)), ' tokens in 30 days');
-    burn.title = `${exact(recent)} tokens in the last 30 days. See them by day.`;
-    burn.hidden = false;
     burn.addEventListener('click', () => {
       only = null;
       pickMetric('all');
