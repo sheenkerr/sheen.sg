@@ -196,15 +196,24 @@ const otherProjects = projects.filter(x => !x.feature);
 // the cards give only the semester; the module code and name wait in the project's own page
 const term = x => x.product.split(', ').pop();
 // each diagram is the project's cover now: its own colour, with its mark top right where the old cover wore it
-const visualHead = (id, label) => `<div class="visual-head"><p class="visual-label">${label}</p>${REPO_MARK[id] ? repoMark(id) : ''}</div>`;
+// FlowFox's and Virtual Vault's diagrams play once in view (js/project-motion.js), which also shows their Replay button
+// only where it can play. Their markup is the last frame; the wires and the shoppers are drawn in as each nears the screen.
+const replayBtn = what => `<button class="pv-replay" type="button" aria-label="Replay ${what}" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.6M4.6 1.4v3h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Replay</span></button>`;
+const visualHead = (id, label, replay) => `<div class="visual-head"><p class="visual-label">${label}</p>${replay ? replayBtn(replay) : ''}${REPO_MARK[id] ? repoMark(id) : ''}</div>`;
 const projectVisuals = {
-  flowfox: `<div class="project-visual" role="group" aria-label="FlowFox deployment architecture">
-    ${visualHead('flowfox', 'From commit to live')}
-    <div class="flow">
-      <div class="node">Push to main</div>
-      <div class="node">GitHub Actions<small>Builds only what changed, signs in to AWS with OIDC</small></div>
-      <div class="fork"><div class="node">Frontend<small>S3 → CloudFront</small></div><div class="node">API<small>ECR → Fargate</small></div></div>
-      <div class="node">Live check<small>The site is serving this commit</small></div>
+  flowfox: `<div class="project-visual" data-pv="deploy" role="group" aria-label="FlowFox deployment architecture">
+    ${visualHead('flowfox', 'From commit to live', 'the FlowFox deploy')}
+    <div class="pv-deploy">
+      <svg class="pv-wires" aria-hidden="true"></svg>
+      <ol class="pv-flow" aria-label="Deploy steps; the API and frontend steps run in parallel">
+        <li class="pv-node" data-n="push"><small>GitHub</small><b>Push to main</b></li>
+        <li class="pv-node" data-n="diff"><small>GitHub Actions</small><b>Builds only what changed, signs in to AWS with OIDC</b></li>
+        <li class="pv-node" data-n="api1"><small>API</small><b>Image to ECR</b></li>
+        <li class="pv-node" data-n="api2"><small>API</small><b>New task on Fargate</b></li>
+        <li class="pv-node" data-n="fe1"><small>Frontend</small><b>Upload to S3</b></li>
+        <li class="pv-node" data-n="fe2"><small>Frontend</small><b>CloudFront cache cleared</b></li>
+        <li class="pv-node" data-n="live"><small>Live check</small><b>Serving this commit <svg class="pv-tick" viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M3 8.5l3.2 3.2L13 4.5"/></svg></b></li>
+      </ol>
     </div>
   </div>`,
   peerprep: `<div class="project-visual" role="group" aria-label="PeerPrep request architecture">
@@ -215,15 +224,18 @@ const projectVisuals = {
       <div class="fork fit"><div class="node">User</div><div class="node">Matching</div><div class="node">Collaboration</div></div>
     </div><p class="visual-note">Filled: the part I built. Calls only reach live, registered services.</p>
   </div>`,
-  vault: `<div class="project-visual" role="group" aria-label="Virtual Vault soak test findings">
-    ${visualHead('vault', 'Beyond a short test run')}
-    <p class="project-stat">14 hours</p><p class="stat-context">100 simulated shoppers<br>Almost 2 million requests</p>
-    <div class="soak">
-      <p class="soak-event">Order history starts timing out at 4½ h</p>
-      <div class="soak-track" aria-hidden="true"><i></i></div>
-      <div class="soak-wedge" aria-hidden="true"></div>
-      <div class="soak-scale"><span><b>0 h</b>0.1 GB</span><span>Backend memory</span><span><b>14 h</b>2.1 GB</span></div>
-      <p class="soak-note">Memory climbed the whole run and never settled back.</p>
+  vault: `<div class="project-visual" data-pv="soak" role="group" aria-label="Virtual Vault soak test findings">
+    ${visualHead('vault', 'Beyond a short test run', 'the soak test')}
+    <div class="pv-soak">
+      <svg class="pv-crowd" viewBox="0 0 100 100" aria-hidden="true"></svg>
+      <div class="pv-stat"><p class="project-stat"><span class="pv-clock" aria-hidden="true">14h 00m</span><span class="sr">14 hours</span></p>
+        <p class="stat-context">100 simulated shoppers<br>Almost 2 million requests</p></div>
+      <div class="pv-chart">
+        <p class="pv-event">Order history starts timing out at 4½ h</p>
+        <div class="pv-plot" aria-hidden="true"><div class="pv-track"></div><div class="pv-wedge"></div><i class="pv-sweep"></i><i class="pv-mark"></i><i class="pv-drop"></i></div>
+        <div class="pv-scale"><span><b>0 h</b>0.1 GB</span><span>Backend memory<b class="pv-gb" aria-hidden="true">2.1 GB</b></span><span><b>14 h</b>2.1 GB</span></div>
+      </div>
+      <p class="pv-note">Memory climbed the whole run and never settled back. Only its start and end were measured, so the line between them is straight. Amber shows when timeouts began, not how many shoppers they hit.</p>
     </div>
   </div>`,
 };
