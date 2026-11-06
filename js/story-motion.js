@@ -1,7 +1,7 @@
 // Animated diagrams for three Nested stories and the PeerPrep panel on the homepage.
 // Each story's art() is its finished frame. build(el, tl) creates a paused GSAP timeline that animates from its start
 // state back to the markup's own styles; reverting a completed or cancelled timeline leaves the finished diagram.
-// GSAP loads only once motion is allowed and a diagram nears the screen unseen after page load, or on Replay.
+// GSAP loads only once motion is allowed and a diagram nears the screen after page load, or on Replay.
 window.STORY_MOTION = (() => {
   const HOME = ['stripe', 'llm', 'formulas', 'peerprep'];
   const ICON = {
@@ -189,9 +189,8 @@ window.STORY_MOTION = (() => {
   const art = id => designs[id].art();
 
   // ---------- players: autoplay once in view, pause off screen or in a hidden tab, replay on request ----------
-  // A diagram autoplays only if its start frame was set up before any of it showed. One that was already on screen
-  // finished (the first load, or GSAP still arriving) stays finished and offers Replay, so it never jumps back to start
-  // in view, and the first visible card needs no GSAP at all.
+  // A diagram shows its finished frame until GSAP is here. Once it is, a diagram near the screen is set to its start frame
+  // and plays once enough of it is in view, even one that was already on screen finished while GSAP was arriving.
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   let gsapLoad = null;
   const motionOn = () => !reduce.matches && typeof IntersectionObserver === 'function';
@@ -210,7 +209,7 @@ window.STORY_MOTION = (() => {
   const players = new Map();
   function player(stage, id, replay) {
     const def = designs[id];
-    // vis: any of it on screen; inView: enough to play; played: run, or seen finished, so it won't autoplay again;
+    // vis: any of it on screen; inView: enough to play; played: run once, so it won't autoplay again;
     // req: the Replay click waiting for GSAP, dropped if anything changes before it arrives
     const p = { stage, id, replay, played: false, near: false, vis: false, inView: false, tl: null, req: null };
     p.make = () => {
@@ -225,23 +224,20 @@ window.STORY_MOTION = (() => {
       if (p.tl) { p.tl.revert(); p.tl.kill(); p.tl = null; }
       p.req = null;
     };
-    // set up the start frame while it's still off screen; on screen already, it has been seen finished
-    p.arm = showsNow => {
+    // set up the start frame once GSAP is here, then play it if it's already in view
+    p.arm = () => {
       if (!motionOn() || p.played || p.tl) return;
-      if (showsNow && !document.hidden) { p.played = true; return; }
       afterLoad(() => p.near && !p.played && withGsap(() => {
         if (!p.near || p.played || p.tl || !motionOn()) return;
-        if (p.vis && !document.hidden) p.played = true; else p.make();
+        p.make(); p.look();
       }));
     };
     // GSAP is here and it can't be seen yet (it's only just been given a box): set up the start frame now, before it paints
     p.prime = () => { if (window.gsap && motionOn() && !p.played && !p.tl) p.make(); };
     p.disarm = () => { if (!p.played) p.stop(); };
-    // autoplay, which never waits for GSAP: only a start frame set up earlier plays
+    // autoplay, which never waits for GSAP: only a start frame already set up plays
     p.look = () => {
-      if (!p.vis || document.hidden) return;
-      if (!p.tl) { p.played = true; return; }
-      if (!p.inView) return;
+      if (!p.vis || document.hidden || !p.tl || !p.inView) return;
       if (!p.played) { p.played = true; p.tl.play(0); } else p.resume();
     };
     // Replay: from the start, now or once GSAP arrives, if it's still on screen and nothing has changed by then
@@ -277,7 +273,7 @@ window.STORY_MOTION = (() => {
   const near = typeof IntersectionObserver === 'function' && new IntersectionObserver(es => es.forEach(e => {
     const p = players.get(e.target); if (!p) return;
     p.near = e.isIntersecting && hasBox(e.boundingClientRect);
-    if (p.near) p.arm(onScreen(e.boundingClientRect)); else p.disarm();
+    if (p.near) p.arm(); else p.disarm();
   }), { rootMargin: '240px 0px' });
   const seen = near && new IntersectionObserver(es => es.forEach(e => {
     const p = players.get(e.target); if (!p) return;
@@ -291,7 +287,7 @@ window.STORY_MOTION = (() => {
     const on = motionOn();
     if (p.replay) p.replay.hidden = !on;
     if (!on) return p.stop();
-    if (p.near) p.arm(p.vis);
+    if (p.near) p.arm();
     p.look();
   }
   if (reduce.addEventListener) reduce.addEventListener('change', () => players.forEach(applyMotion));
@@ -344,7 +340,7 @@ window.STORY_MOTION = (() => {
     }
     // the cards behind Show all stories have no box to watch until it opens, so their start frames are set up as it
     // opens, before they paint. This listener runs after js/app.js's own, so the grid is already open. GSAP is fetched
-    // once the button is pointed at or focused; if it isn't here by the click, they show finished and offer Replay.
+    // once the button is pointed at or focused; if it isn't here by the click, they show finished until it arrives.
     const more = document.getElementById('moreStories');
     if (more) {
       const warm = () => { if (motionOn()) withGsap(() => {}); };

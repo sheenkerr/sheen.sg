@@ -189,7 +189,7 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
 <script src="js/app.js"></script>
 <!-- swaps three story drawings and animates the PeerPrep panel once its styles are here. Async, so it doesn't hold up the
      page; a script after js/app.js only runs once that has drawn the page. GSAP loads later, and only for a diagram that
-     nears the screen unseen after the page has loaded, or a Replay -->
+     nears the screen after the page has loaded, or a Replay -->
 <script src="js/story-motion.js" data-mount="home" async></script>
 <script src="js/project-motion.js" defer></script>
 <script src="js/usage.js" defer></script>
