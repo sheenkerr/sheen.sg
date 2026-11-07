@@ -198,7 +198,7 @@ const term = x => x.product.split(', ').pop();
 // each diagram is the project's cover now: its own colour, with its mark top right where the old cover wore it
 // FlowFox's and Virtual Vault's diagrams play once in view (js/project-motion.js), which also shows their Replay button
 // only where it can play. Their markup is the last frame; the wires and the shoppers are drawn in as each nears the screen.
-const replayBtn = what => `<button class="pv-replay" type="button" aria-label="Replay ${what}" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.6M4.6 1.4v3h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Replay</span></button>`;
+const replayBtn = what => `<button class="pv-replay" type="button" aria-label="Replay ${what}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 2v8L7 6z" fill="currentColor"/></svg><span>Replay</span></button>`;
 const visualHead = (id, label, replay) => `<div class="visual-head"><p class="visual-label">${label}</p>${replay ? replayBtn(replay) : ''}${REPO_MARK[id] ? repoMark(id) : ''}</div>`;
 const projectVisuals = {
   flowfox: `<div class="project-visual" data-pv="deploy" role="group" aria-label="FlowFox deployment architecture">

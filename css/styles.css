@@ -294,7 +294,7 @@
      the card, and only Replay sits above it, as the code link does. */
   /* All card Replay controls share geometry; their own rules keep each card's colours and placement. */
   .pv-replay, .sm-replay { box-sizing: border-box; display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent); cursor: pointer; }
-  .pv-replay svg, .sm-replay svg { display: block; flex: none; width: 16px; height: 16px; }
+  .pv-replay svg, .sm-replay svg { display: block; flex: none; width: 18px; height: 18px; }
   .pv-replay:focus-visible, .sm-replay:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
   .pv-replay span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (pointer: coarse) { .pv-replay, .sm-replay { width: 44px; height: 44px; } }

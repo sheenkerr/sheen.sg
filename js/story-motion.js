@@ -308,7 +308,7 @@ window.STORY_MOTION = (() => {
   addEventListener('resize', () => { if (!queued) { queued = true; requestAnimationFrame(remeasure); } });
   document.fonts?.ready.then(remeasure);
 
-  const replayBtn = label => `<button class="sm-replay" type="button" aria-label="Replay animation: ${label}" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.6M4.6 1.4v3h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  const replayBtn = label => `<button class="sm-replay" type="button" aria-label="Replay animation: ${label}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 2v8L7 6z" fill="currentColor"/></svg></button>`;
 
   // ---------- the homepage: swap three story covers' drawings and animate the PeerPrep panel ----------
   // Runs once js/app.js has drawn the page and css/story-motion.css has arrived. A story card is a button, so its Replay
