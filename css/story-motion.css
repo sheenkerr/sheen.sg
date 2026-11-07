@@ -1,0 +1,168 @@
+@charset "utf-8";
+  /* Story motion: animated diagrams for the homepage. Everything is scoped to sm- classes (and pp- inside PeerPrep).
+     The stylesheet loads without blocking and is enabled as the diagrams mount.
+     Each diagram's markup is its last frame; GSAP only ever animates from a start state back to these styles, on
+     transform, opacity, clip-path, box-shadow and one custom property, --on. */
+
+  /* ---------- the art region: where a cover's drawing would be, at that drawing's size ---------- */
+  .sm-art {
+    --sm-h: 26px; --sm-corner: 30px;
+    position: absolute; container: sm / size; pointer-events: none;
+    color: inherit; font: 700 0.75rem/1.15 var(--display, "Manrope", system-ui, sans-serif); letter-spacing: -0.01em;
+  }
+  .sm-in { position: relative; width: 100%; height: 100%; }
+  /* A small card keeps its drawing to the top, in the room the cover already leaves above its title. Every region is
+     sized by its card, never its content, so swapping one in moves nothing on the page. */
+  .cover > .sm-art { top: 14px; right: 14px; width: calc(100% - 28px); height: 84px; }
+  /* The featured card on a desktop: the drawing takes the room the title leaves above it, up to 180px, so it can't reach
+     the title however that wraps. With no basis of its own it adds nothing to the cover's height. */
+  .story.feat .cover > .sm-art {
+    position: relative; top: auto; right: auto; flex: 1 1 0; width: auto; height: auto; min-height: 0; max-height: 180px;
+    margin: -8px -8px auto; padding-bottom: 14px;
+  }
+  /* beside the title on a tablet, the drawing keeps to the 206px the title leaves it; above it again on a phone */
+  @media (max-width: 1023px) {
+    .story.feat .cover > .sm-art { position: absolute; top: 18px; right: 18px; flex: none; width: 206px; height: 140px; max-height: none; margin: 0; padding: 0; }
+  }
+  @media (max-width: 600px) { .story.feat .cover > .sm-art { width: calc(100% - 36px); height: 92px; } }
+  /* The story's page; on a phone its title can rise into the top 40% of the cover, so there the drawing keeps a fixed
+     112px and the cover keeps that room above the title (js/story-motion.js marks a cover that holds one) */
+  .reader .cover > .sm-art { --sm-corner: 38px; top: 28px; right: 28px; width: calc(100% - 56px); height: 40%; }
+  @media (max-width: 560px) { .reader .cover > .sm-art { height: 112px; } .reader .cover.sm-cover { padding-top: 154px; } }
+  @media (pointer: coarse) { .sm-art { --sm-corner: 38px; } }
+  /* the top-right corner stays clear for Replay (and the story page's close button); a diagram puts nothing in its first
+     row there. A tall, wide region (the featured card on a desktop, the story's page) gets larger type and second lines */
+  @container sm (min-height: 104px) and (min-width: 360px) { .sm-in { --sm-h: 30px; font-size: 0.8125rem; } }
+
+  /* a step in a diagram: the same soft box as the project diagrams' steps, outlined in the cover's ink.
+     --on (0 to 1) is how lit it is; a step that waits starts at 0, and the last frame is always 1 */
+  .sm-n {
+    --on: 1; --lp: 32%;
+    position: relative; display: inline-grid; align-content: center; justify-items: start; gap: 1px;
+    min-height: var(--sm-h); padding: 3px 8px; border-radius: 8px; white-space: nowrap;
+    border: 1.5px solid color-mix(in srgb, currentColor calc(var(--on) * var(--lp)), transparent);
+    background: rgba(255, 255, 255, calc(var(--on) * .62));
+  }
+  .sm-n.is-on { --lp: 100%; }
+  .sm-n b { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+  .sm-n small { display: none; font-size: 0.6875rem; font-weight: 600; opacity: .82; }
+  @container sm (min-height: 104px) and (min-width: 360px) { .sm-n small { display: block; } .sm-n { padding: 4px 10px; } }
+  .sm-ic { flex: none; width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .sm-ic path[pathLength] { stroke-dasharray: 1; stroke-dashoffset: 0; }
+
+  /* a wire between steps, drawn by scale, with a dot that travels it once */
+  .sm-w { position: relative; align-self: center; height: 2px; margin: 0 4px; }
+  .sm-v { justify-self: center; align-self: stretch; width: 2px; height: auto; margin: 3px 0; }
+  .sm-l { position: absolute; inset: 0; background: color-mix(in srgb, currentColor 55%, transparent); transform-origin: left center; }
+  .sm-v .sm-l { transform-origin: center top; }
+  /* an arrowhead at the far end */
+  .sm-l::after { content: ""; position: absolute; right: -1px; top: 50%; width: 6px; height: 6px; border: solid color-mix(in srgb, currentColor 55%, transparent); border-width: 2px 2px 0 0; transform: translateY(-50%) rotate(45deg); }
+  .sm-v .sm-l::after { right: auto; top: auto; left: 50%; bottom: -1px; transform: translateX(-50%) rotate(135deg); }
+  .sm-run { position: absolute; inset: 0; opacity: 0; }
+  .sm-run > i { position: absolute; left: 0; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 2.5px var(--cv, #fff); }
+  .sm-v .sm-run > i { left: 50%; top: 0; }
+  /* a narrow region (the featured card beside its title on a tablet, a small card at 1024px) gets tighter boxes; after
+     the rules above, which it overrides */
+  @container sm (max-width: 240px) { .sm-in { font-size: 0.6875rem; } .sm-n { padding-inline: 5px; } .sm-w:not(.sm-v) { margin: 0 2px; } }
+
+  /* ---------- Stripe: Checkout → Stripe, down to the webhook, across to billing; the key mode sits under checkout ---------- */
+  .sm-stripe .sm-in {
+    display: grid; align-items: center;
+    grid-template-columns: auto minmax(8px, 1fr) auto minmax(8px, 1fr) auto;
+    grid-template-rows: auto minmax(8px, 1fr) auto;
+  }
+  .s-checkout { grid-area: 1 / 1; }
+  .s-w1 { grid-area: 1 / 2; }
+  .s-stripe { grid-area: 1 / 3; justify-self: center; }
+  .s-w2 { grid-area: 2 / 3; }
+  .sm-mode { grid-area: 3 / 1; justify-self: start; }
+  .s-hook { grid-area: 3 / 3; justify-self: center; }
+  .s-w3 { grid-area: 3 / 4; }
+  .s-bill { grid-area: 3 / 5; }
+  .sm-mode {
+    position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px;
+    border: 1.5px solid color-mix(in srgb, currentColor 32%, transparent); border-radius: 999px; font-size: 0.6875rem;
+  }
+  .sm-mode > span { position: relative; z-index: 1; padding: 3px 7px; text-align: center; }
+  .sm-mode .m-live { color: var(--cv, #fff); }
+  .sm-knob { position: absolute; top: 2px; bottom: 2px; right: 2px; width: calc(50% - 2px); border-radius: 999px; background: currentColor; }
+  /* Under 300px the five columns don't fit at a readable size, so the steps turn back on themselves: Checkout → Stripe,
+     down to the webhook, and back left to billing, with the key switch between the two rows. The first row stops short of
+     the Replay corner. The last wire then runs right to left, so it grows from its right end and its dot starts there. */
+  @container sm (max-width: 299.98px) {
+    .sm-stripe .sm-in { grid-template-columns: auto minmax(8px, 1fr) auto; width: calc(100% - var(--sm-corner)); }
+    .s-bill { grid-area: 3 / 1; }
+    .s-w3 { grid-area: 3 / 2; }
+    .sm-mode { grid-area: 2 / 1; }
+    .s-w3 .sm-l { transform-origin: right center; }
+    .s-w3 .sm-l::after { right: auto; left: -1px; transform: translateY(-50%) rotate(-135deg); }
+    .s-w3 .sm-run > i { left: 100%; }
+  }
+
+  /* ---------- model fallback: a call, two rails, the primary above the backup ---------- */
+  .sm-llm .sm-in { display: grid; grid-template-columns: 10px 30px auto; grid-template-rows: 1fr 1fr; align-items: center; justify-content: start; }
+  .l-req { grid-area: 1 / 1 / 3 / 2; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+  .l-rails { grid-area: 1 / 2 / 3 / 3; position: relative; align-self: stretch; }
+  .l-stub { position: absolute; left: 0; top: 50%; width: 10px; height: 2px; margin-top: -1px; background: currentColor; transform-origin: left center; }
+  .l-rail { position: absolute; left: 9px; right: 0; border: 0 solid color-mix(in srgb, currentColor 30%, transparent); border-left-width: 2px; }
+  .l-rail.up { top: calc(25% - 1px); bottom: 50%; border-top-width: 2px; border-top-left-radius: 8px; }
+  .l-rail.down { top: 50%; bottom: calc(25% - 1px); border-bottom-width: 2px; border-bottom-left-radius: 8px; }
+  .l-rail.on { border-color: currentColor; }
+  .l-rail.up.on { opacity: 0; }
+  .l-prim { grid-area: 1 / 3; justify-self: start; border-style: dashed; }
+  .l-x { position: absolute; top: -7px; right: -7px; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #b3261e; color: #fff; font-size: 10px; }
+  .l-x .sm-ic { stroke-width: 2.6; }
+  .l-row { grid-area: 2 / 3; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .l-badge { position: relative; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .l-ring { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid currentColor; opacity: 0; }
+  .l-say { font-size: 0.6875rem; font-weight: 600; opacity: .82; }
+
+  /* ---------- formula references: the formula on top, the attribute it reads below, the refused delete beside it ---------- */
+  .sm-formulas .sm-in { display: grid; align-content: center; justify-items: start; row-gap: 6px; }
+  .f-row { display: flex; align-items: baseline; gap: 6px; margin: 0; }
+  .f-eg { font-size: 0.6875rem; font-weight: 600; opacity: .82; }
+  .f-code, .f-y { font: 600 0.8125rem/1.2 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; letter-spacing: 0; }
+  .f-code i { font-style: normal; }
+  .f-tok, .f-y { --on: 1; display: inline-block; padding: 0 3px; border-radius: 4px; background: color-mix(in srgb, currentColor calc(var(--on) * 16%), transparent); }
+  .f-row2 { display: grid; justify-items: start; row-gap: 6px; }
+  .f-attr { grid-auto-flow: column; gap: 8px; }
+  .f-act { display: grid; font-size: 0.6875rem; }
+  .f-act > * { grid-area: 1 / 1; align-self: center; }
+  .f-del { justify-self: start; padding: 1px 8px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, currentColor 40%, transparent); opacity: 0; }
+  .f-msg { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .f-msg .sm-ic { width: 1.1em; height: 1.1em; }
+  @container sm (min-width: 300px) { .f-row2 { grid-auto-flow: column; align-items: center; column-gap: 12px; } }
+
+  /* ---------- PeerPrep: the panel's own diagram, with a live mark on each registered service and a layer of dots ---------- */
+  .pp-flow { position: relative; }
+  .sm-pp .flow { pointer-events: none; }
+  /* the marks sit on each box's corner, clear of its name, so the boxes keep the width the panel was tuned to */
+  .pp-live, .pp-link { position: absolute; border-radius: 50%; box-shadow: 0 0 0 2px var(--cv, #fff); }
+  .pp-live { top: -3px; right: -3px; width: 7px; height: 7px; background: currentColor; }
+  .pp-link { top: -6px; right: -6px; display: grid; place-items: center; width: 14px; height: 14px; background: var(--cv, #fff); }
+  .pp-link .sm-ic { width: 10px; height: 10px; stroke-width: 1.9; }
+  .flow > .pp-fx { position: absolute; inset: 0; margin: 0; }
+  .pp-dot { position: absolute; left: 0; top: 0; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 2.5px var(--cv, #fff); opacity: 0; }
+  /* the panel's header is 40px tall with only its label in it; a 44px touch Replay overhangs it instead of making it
+     taller, so showing Replay moves nothing below */
+  @media (pointer: coarse) { .sm-pp .visual-head > .pv-replay { margin-block: -2px; } }
+
+  /* ---------- Replay: over a story card's top-right corner, outside the card's own button ---------- */
+  .sm-cell { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); min-width: 0; }
+  /* the card and Replay share the one cell; this has to outrank .story.feat's two-column span, so it is as specific and
+     this file loads after css/styles.css */
+  .sm-cell > .story, .sm-cell > .sm-replay { grid-area: 1 / 1 / 2 / 2; }
+  .sm-cell > .story { border-radius: inherit; }
+  .sm-cell.sm-feat { grid-column: span 2; grid-row: span 2; }
+  @media (max-width: 1023px) { .sm-cell.sm-feat { grid-row: auto; grid-column: 1 / -1; } }
+  .sm-replay {
+    position: relative; z-index: 1; justify-self: end; align-self: start; margin: 6px;
+    background: rgba(255, 255, 255, .7); color: inherit;
+    transition: translate .18s ease, background .18s ease;
+  }
+  .sm-replay[hidden] { display: none; }
+  .sm-replay:hover { background: rgba(255, 255, 255, .92); }
+  /* it rides along when the card under it lifts */
+  .sm-cell:has(> .story:hover) > .sm-replay { translate: 0 -2px; }
+  @media (pointer: coarse) { .sm-replay { margin: 3px; } }
+  @media (prefers-reduced-motion: reduce) { .sm-replay { transition: none; } .sm-cell:has(> .story:hover) > .sm-replay { translate: none; } }

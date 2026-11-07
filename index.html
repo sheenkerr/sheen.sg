@@ -63,6 +63,9 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
 <link rel="apple-touch-icon" href="images/me/apple-touch-icon.png">
 <link rel="preload" href="fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/styles.css">
+<!-- the story animations' styles: as a print stylesheet it loads without holding up the first paint, and
+     js/story-motion.js switches it on as it swaps the animated diagrams in -->
+<link rel="stylesheet" href="css/story-motion.css" media="print">
 </head>
 <body>
 <header class="topbar">
@@ -72,7 +75,7 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
       <li><a href="#stories" data-tab="stories">Stories</a></li>
       <li><a href="#projects" data-tab="projects">Projects</a></li>
       <li><a href="#education" data-tab="education">Education</a></li>
-      <li><a href="#skills" data-tab="skills">Skills</a></li>
+      <li><a href="#tokens" data-tab="tokens">Tokens</a></li>
     </ul></nav>
     <div class="reach">
       <a class="btn" href="cv-sheen.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M10.5 2H5a1.5 1.5 0 0 0-1.5 1.5v11A1.5 1.5 0 0 0 5 16h8a1.5 1.5 0 0 0 1.5-1.5V6zM10.5 2v4h4M6.5 9.5h5M6.5 12.5h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="long">View </span>CV</span></a>
@@ -91,7 +94,10 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
     <section class="w intro s2" aria-label="Introduction">
       <img class="photo" src="images/me/headshot.jpg" width="320" height="320" alt="Photo of Sheen">
       <div>
-        <p class="hi">Hi <span class="wave" role="img" aria-label="waving hand">👋</span></p>
+        <div class="hi-row">
+          <p class="hi">Hi <span class="wave" role="img" aria-label="waving hand">👋</span></p>
+          <a class="burn" id="burn" href="#tokens" title="Tokens used in the last 30 days. See them by day."><span class="burn-flame" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8.6 1.2c.3 2.1-.6 3.3-1.6 4.4C6 6.8 4.6 8.1 4.6 10.3A3.5 3.5 0 0 0 8 14.5a3.6 3.6 0 0 0 3.6-3.7c0-1.3-.5-2.3-1.2-3.1.1 1-.3 1.8-1 2.1.3-2.4-.2-6.2-.8-8.6z" fill="currentColor"/></svg></span><span id="burnText">Token usage<span aria-hidden="true"> · past 30d</span><span class="sr"> in the past 30 days</span></span></a>
+        </div>
         <p>Software engineer at DSTA in Singapore and an NUS Computer Science graduate. I build backend services, the data models under them and the deployment around them.</p>
       </div>
     </section>
@@ -126,14 +132,13 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
     </section>
 
     <section class="w projects s4" id="projects" aria-labelledby="proj-h">
-      <div class="shelf-head">
+      <div class="projects-head">
         <h2 id="proj-h" class="w-title">Projects</h2>
-        <div class="shelf-nav" id="shelfNav" hidden>
-          <button type="button" data-dir="-1" aria-label="Previous projects" aria-controls="shelf"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button type="button" data-dir="1" aria-label="More projects" aria-controls="shelf"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
+        <p>What I’ve built, shipped and tested.</p>
       </div>
-      <div class="shelf" id="shelf"></div>
+      <div class="project-features" id="projectFeatures"></div>
+      <h3 class="more-projects-h" id="more-projects-h">More Projects</h3>
+      <div class="project-grid" id="projectGrid" role="group" aria-labelledby="more-projects-h"></div>
     </section>
 
     <section class="w edu s4" id="education" aria-labelledby="edu-h">
@@ -141,10 +146,29 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
       <ol class="rail" id="edu"></ol>
     </section>
 
-    <section class="w skills s4" id="skills" aria-labelledby="sk-h">
-      <h2 id="sk-h" class="w-title">Skills</h2>
-      <p class="w-sub">Tap a skill to see where I used it.</p>
-      <div id="sk"></div>
+    <section class="w usage s4" id="tokens" aria-labelledby="usage-h">
+      <div class="usage-head">
+        <h2 id="usage-h" class="w-title">Token usage</h2>
+        <p class="w-sub">What Claude Code, Codex and Antigravity have read and written for me, combined. <span id="usageUpdated"></span></p>
+      </div>
+      <div class="usage-figures" id="usageFigures"></div>
+      <div class="usage-chart">
+        <div class="usage-bar">
+          <h3 class="usage-h3" id="usageChartH">Tokens per day</h3>
+          <div class="usage-controls">
+            <div class="seg" role="radiogroup" aria-label="Token type" id="usageMetric"></div>
+            <div class="seg" role="radiogroup" aria-label="Period" id="usageRange" hidden></div>
+          </div>
+        </div>
+        <ul class="usage-legend" id="usageLegend"></ul>
+        <div class="usage-graph">
+          <div class="usage-y" id="usageY" aria-hidden="true"></div>
+          <div class="usage-plot" id="usagePlot" tabindex="0"><div class="usage-tip" id="usageTip" role="status" hidden></div></div>
+        </div>
+        <div class="usage-x" id="usageX" aria-hidden="true"></div>
+        <details class="usage-fold usage-days"><summary>Daily figures <span class="usage-count" id="usageDaysCount"></span></summary><div class="usage-scroll" id="usageDays"></div></details>
+      </div>
+      <details class="usage-fold usage-by-model"><summary>By Model <span class="usage-count" id="usageModelsCount"></span></summary><div class="usage-scroll" id="usageModels" role="region" aria-label="Tokens by model" tabindex="0"></div></details>
     </section>
 
     <section class="w contact s4" aria-labelledby="c-h">
@@ -163,6 +187,12 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
 <script src="js/toys.js"></script>
 <script src="js/logos.js"></script>
 <script src="js/app.js"></script>
+<!-- swaps three story drawings and animates the PeerPrep panel once its styles are here. Async, so it doesn't hold up the
+     page; a script after js/app.js only runs once that has drawn the page. GSAP loads later, and only for a diagram that
+     nears the screen after the page has loaded, or a Replay -->
+<script src="js/story-motion.js" data-mount="home" async></script>
+<script src="js/project-motion.js" defer></script>
+<script src="js/usage.js" defer></script>
 <!-- GoatCounter counts visits without cookies; js/app.js also counts story and project opens, CV views and links off the site -->
 <script data-goatcounter="https://sheen.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

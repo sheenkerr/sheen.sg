@@ -3,3 +3,12 @@ local/
 
 # Claude Code preview settings for this machine
 .claude/
+
+# Python bytecode from running tools/
+__pycache__/
+
+# Keep README files locally rather than in the public repository
+[Rr][Ee][Aa][Dd][Mm][Ee]*
+
+# Token import scripts and tests are used only on this machine
+/tools/usage/
