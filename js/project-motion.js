@@ -3,11 +3,10 @@
 // and fills only backwards, so stopping at any moment, reduced motion, or a browser without the API all leave the finished
 // diagram in place. A panel's wires and shoppers are drawn in as it nears the screen; it plays once when it comes into view,
 // pauses while it's off screen or the tab is hidden, and replays on request.
-(() => {
+// The open project's page shows the same panel; js/app.js mounts it there with PROJECT_MOTION.mount and plays it once.
+window.PROJECT_MOTION = (() => {
   const $ = (s, el) => el.querySelector(s);
   const $$ = (s, el) => [...el.querySelectorAll(s)];
-  const panels = $$('.project-visual[data-pv]', document);
-  if (!panels.length) return;
   const canAnimate = typeof document.body.animate === 'function' && typeof KeyframeEffect === 'function' && typeof Animation === 'function';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const motionOn = () => canAnimate && !reduce.matches;
@@ -223,38 +222,50 @@
     replay.addEventListener('click', () => p.play());
     return p;
   }
-  const players = panels.filter(el => DEFS[el.dataset.pv]).map(el => player(el, DEFS[el.dataset.pv]));
-  const of = el => players.find(p => p.panel === el);
+  const players = new Set();
+  const of = el => [...players].find(p => p.panel === el);
 
   const inView = new Set();
-  if (typeof IntersectionObserver === 'function') {
-    const near = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) { of(e.target).prepare(); near.unobserve(e.target); }
-    }), { rootMargin: '400px 0px' });
-    const seen = new IntersectionObserver(entries => entries.forEach(e => {
-      const p = of(e.target);
-      if (e.isIntersecting && e.intersectionRatio >= .4) {
-        inView.add(p);
-        if (document.hidden) return;
-        if (!p.played) p.play(); else p.resume();
-      } else if (!e.isIntersecting) {
-        inView.delete(p);
-        p.pause();
-      }
-    }), { threshold: [0, .4] });
-    players.forEach(p => { near.observe(p.panel); seen.observe(p.panel); });
-  } else players.forEach(p => p.prepare());
+  const io = typeof IntersectionObserver === 'function';
+  const near = io && new IntersectionObserver(entries => entries.forEach(e => {
+    const p = of(e.target);
+    if (p && e.isIntersecting) { p.prepare(); near.unobserve(e.target); }
+  }), { rootMargin: '400px 0px' });
+  // a homepage panel plays by itself the first time it's in view; one mounted with auto off waits for play()
+  const seen = io && new IntersectionObserver(entries => entries.forEach(e => {
+    const p = of(e.target); if (!p) return;
+    if (e.isIntersecting && e.intersectionRatio >= .4) {
+      inView.add(p);
+      if (document.hidden) return;
+      if (!p.played) { if (p.auto) p.play(); } else p.resume();
+    } else if (!e.isIntersecting) {
+      inView.delete(p);
+      p.pause();
+    }
+  }), { threshold: [0, .4] });
+  function mount(panel, { auto = true } = {}) {
+    const def = DEFS[panel.dataset.pv]; if (!def) return null;
+    const p = player(panel, def);
+    p.auto = auto;
+    p.replay.hidden = !motionOn();
+    // ends on the last frame and lets go of the panel, for one that's leaving the page
+    p.destroy = () => { p.stop(); players.delete(p); inView.delete(p); if (io) { near.unobserve(panel); seen.unobserve(panel); } };
+    players.add(p);
+    if (io) { near.observe(panel); seen.observe(panel); } else p.prepare();
+    return p;
+  }
+  $$('.project-visual[data-pv]', document).forEach(el => mount(el));
   // a panel that came into view while the tab was hidden hasn't played yet, so it starts now
   document.addEventListener('visibilitychange', () => players.forEach(p => {
     if (document.hidden) p.pause();
-    else if (inView.has(p)) p.played ? p.resume() : p.play();
+    else if (inView.has(p)) p.played ? p.resume() : p.auto && p.play();
   }));
 
   // the wires follow the steps when the page is resized or the font arrives: every panel is measured, then every panel drawn
   let queued = false;
   function relayout() {
     queued = false;
-    const due = players.filter(p => p.state && p.def.measure);
+    const due = [...players].filter(p => p.state && p.def.measure);
     const sizes = due.map(p => p.def.measure(p.stage, p.state));
     due.forEach((p, i) => p.def.apply(p.stage, p.state, sizes[i]));
   }
@@ -267,9 +278,10 @@
     players.forEach(p => {
       p.replay.hidden = !on;
       if (!on) p.stop();
-      else if (!p.played && inView.has(p) && !document.hidden) p.play();
+      else if (p.auto && !p.played && inView.has(p) && !document.hidden) p.play();
     });
   }
   if (reduce.addEventListener) reduce.addEventListener('change', applyMotion); else reduce.addListener?.(applyMotion);
   applyMotion();
+  return { mount };
 })();

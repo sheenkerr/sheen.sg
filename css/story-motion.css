@@ -160,7 +160,6 @@
     background: rgba(255, 255, 255, .7); color: inherit;
     transition: translate .18s ease, background .18s ease;
   }
-  .sm-replay[hidden] { display: none; }
   .sm-replay:hover { background: rgba(255, 255, 255, .92); }
   /* it rides along when the card under it lifts */
   .sm-cell:has(> .story:hover) > .sm-replay { translate: 0 -2px; }

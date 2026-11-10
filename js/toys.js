@@ -1,8 +1,5 @@
-// Two working miniatures of the Nested case studies, shared by the "live" iterations.
-// This file builds the markup and runs it; each page styles the toy-* classes its own way.
+// A working miniature of a Nested case study. This file builds the markup and runs it; css/styles.css styles the toy-* classes.
 window.TOYS = (() => {
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const wait = ms => new Promise(r => setTimeout(r, still ? 0 : ms));
   const hms = s => [s / 3600 | 0, (s / 60 | 0) % 60, s % 60].map(n => String(n).padStart(2, '0')).join(':');
   // keeps the last few lines; a page can ask for more with data-lines on the toy's root
   function logger(ol) {
@@ -57,34 +54,5 @@ window.TOYS = (() => {
     });
   }
 
-  // Ship it: a push to master registers a new task definition and rolls through stage to prod.
-  function ship(root) {
-    const stages = ['local', 'master', 'stage', 'prod'];
-    root.innerHTML = `
-      <ol class="toy-stages" aria-hidden="true">${stages.map(s => `<li><i></i><span>${s}</span></li>`).join('')}</ol>
-      <p class="toy-state" aria-live="polite">Nothing shipped yet this visit.</p>
-      <ol class="toy-log" aria-hidden="true"><li>github actions, julia</li></ol>
-      <div class="toy-actions"><button type="button" class="toy-go">Push to master</button></div>`;
-    const $ = s => root.querySelector(s), log = logger($('.toy-log')), steps = root.querySelectorAll('.toy-stages li');
-    let rev = 47, shipped = 0, busy = false;
-    $('.toy-go').addEventListener('click', async () => {
-      if (busy) return;
-      busy = true; $('.toy-go').setAttribute('aria-disabled', 'true');
-      const sha = Math.random().toString(16).slice(2, 9);
-      steps.forEach(s => s.className = '');
-      $('.toy-state').textContent = `Shipping ${sha}…`;
-      const lines = [`git push origin master  ${sha}`, `docker build julia:${sha}`, `register task definition julia:${++rev}`, `prod healthy, ${sha} live`];
-      for (let i = 0; i < stages.length; i++) {
-        steps[i].className = 'run'; log(lines[i]);
-        await wait(i ? 420 : 160);
-        steps[i].className = 'on';
-      }
-      shipped++;
-      $('.toy-state').textContent = `${sha} is live. ${shipped} ${shipped === 1 ? 'deploy' : 'deploys'} this visit, none by hand.`;
-      $('.toy-go').textContent = 'Push again';
-      busy = false; $('.toy-go').removeAttribute('aria-disabled');
-    });
-  }
-
-  return { guard, ship };
+  return { guard };
 })();

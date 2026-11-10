@@ -2,8 +2,11 @@
 // Each story's art() is its finished frame. build(el, tl) creates a paused GSAP timeline that animates from its start
 // state back to the markup's own styles; reverting a completed or cancelled timeline leaves the finished diagram.
 // GSAP loads only once motion is allowed and a diagram nears the screen after page load, or on Replay.
+// An open story or the PeerPrep project's page shows the same diagram on its cover; js/app.js mounts it there with
+// cover() or panel() and plays it once as the page opens.
 window.STORY_MOTION = (() => {
-  const HOME = ['stripe', 'llm', 'formulas', 'peerprep'];
+  // ready once the styles are here and the homepage's diagrams are in
+  const api = { ready: false };
   const ICON = {
     tick: '<svg class="sm-ic" viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M3.5 8.4l3 3 6-6.8"/></svg>',
     cross: '<svg class="sm-ic" viewBox="0 0 16 16" aria-hidden="true"><path pathLength="1" d="M5 5l6 6M11 5l-6 6"/></svg>',
@@ -22,7 +25,6 @@ window.STORY_MOTION = (() => {
     // In a narrow region the steps turn back on themselves (css/story-motion.css): billing sits left of the webhook, and
     // the last wire runs right to left.
     stripe: {
-      kind: 'story', title: 'Checkout to live keys',
       layout: el => String(el.querySelector('.s-bill').offsetLeft < el.querySelector('.s-hook').offsetLeft),
       art: () => `<div class="sm-art sm-stripe" data-sm="stripe" aria-hidden="true"><div class="sm-in">
         <span class="sm-n s-checkout"><b>Checkout</b><small>by price ID</small></span>${wire('s-w1')}
@@ -59,7 +61,6 @@ window.STORY_MOTION = (() => {
 
     // ---------- model fallback: the primary fails and the backup answers, with the badge Julia shows ----------
     llm: {
-      kind: 'story', title: 'Backup model answering',
       art: () => `<div class="sm-art sm-llm" data-sm="llm" aria-hidden="true"><div class="sm-in">
         <i class="l-req"></i>
         <span class="l-rails"><i class="l-stub"></i><i class="l-rail up"></i><i class="l-rail down"></i><i class="l-rail up on"></i><i class="l-rail down on"></i></span>
@@ -91,7 +92,6 @@ window.STORY_MOTION = (() => {
 
     // ---------- formula references: the formula reads an attribute's Y-value, so deleting it is refused ----------
     formulas: {
-      kind: 'story', title: 'A reference that holds',
       art: () => `<div class="sm-art sm-formulas" data-sm="formulas" aria-hidden="true"><div class="sm-in">
         <p class="f-row"><span class="f-eg">e.g.</span><code class="f-code">${chars('round(x / y)')}</code></p>
         <div class="f-row2"><span class="sm-n f-attr"><b>Pack size</b><code class="f-y">y = 12</code></span>
@@ -122,7 +122,6 @@ window.STORY_MOTION = (() => {
     // ---------- PeerPrep: services register with the gateway, a request goes through it, a WebSocket reconnects ----------
     // On the homepage this runs over the panel js/app.js already draws, adding only the status marks and a layer of dots.
     peerprep: {
-      kind: 'panel', title: 'Only live services get calls',
       // the layout the dots' paths were worked out for: the panel's width and where its boxes sit
       layout: flow => [flow, ...flow.querySelectorAll('.node')].map(n => `${n.offsetLeft},${n.offsetTop},${n.offsetWidth}`).join(' '),
       augment(flow) {
@@ -210,10 +209,11 @@ window.STORY_MOTION = (() => {
   function player(stage, id, replay) {
     const def = designs[id];
     // vis: any of it on screen; inView: enough to play; played: run once, so it won't autoplay again;
-    // req: the Replay click waiting for GSAP, dropped if anything changes before it arrives
-    const p = { stage, id, replay, played: false, near: false, vis: false, inView: false, tl: null, req: null };
+    // req: the Replay click waiting for GSAP, dropped if anything changes before it arrives;
+    // dead: destroyed, so nothing still waiting on the page's load or on GSAP sets it up or plays it
+    const p = { stage, id, replay, played: false, near: false, vis: false, inView: false, tl: null, req: null, dead: false };
     p.make = () => {
-      if (p.tl) return p.tl;
+      if (p.tl || p.dead) return p.tl;
       p.tl = def.build(stage, gsap.timeline({ paused: true, defaults: { duration: .4, ease: 'power2.out' } }));
       p.layout = def.layout?.(stage);
       p.tl.eventCallback('onComplete', () => queueMicrotask(() => { if (p.tl && p.tl.progress() === 1) p.stop(); }));
@@ -226,26 +226,27 @@ window.STORY_MOTION = (() => {
     };
     // set up the start frame once GSAP is here, then play it if it's already in view
     p.arm = () => {
-      if (!motionOn() || p.played || p.tl) return;
-      afterLoad(() => p.near && !p.played && withGsap(() => {
-        if (!p.near || p.played || p.tl || !motionOn()) return;
+      if (p.dead || !motionOn() || p.played || p.tl) return;
+      afterLoad(() => !p.dead && p.near && !p.played && withGsap(() => {
+        if (p.dead || !p.near || p.played || p.tl || !motionOn()) return;
         p.make(); p.look();
       }));
     };
     // GSAP is here and it can't be seen yet (it's only just been given a box): set up the start frame now, before it paints
-    p.prime = () => { if (window.gsap && motionOn() && !p.played && !p.tl) p.make(); };
+    p.prime = () => { if (!p.dead && window.gsap && motionOn() && !p.played && !p.tl) p.make(); };
     p.disarm = () => { if (!p.played) p.stop(); };
     // autoplay, which never waits for GSAP: only a start frame already set up plays
     p.look = () => {
-      if (!p.vis || document.hidden || !p.tl || !p.inView) return;
+      if (p.dead || !p.vis || document.hidden || !p.tl || !p.inView) return;
       if (!p.played) { p.played = true; p.tl.play(0); } else p.resume();
     };
     // Replay: from the start, now or once GSAP arrives, if it's still on screen and nothing has changed by then
     p.play = () => {
+      if (p.dead) return;
       if (!motionOn()) return p.stop();
       const req = p.req = {};
       withGsap(() => {
-        if (p.req !== req || !motionOn() || document.hidden) return;
+        if (p.dead || p.req !== req || !motionOn() || document.hidden) return;
         // Focus or a click can scroll the button into view before IntersectionObserver catches up.
         // Check the actual box once for this explicit request, including after a delayed GSAP load.
         if (!onScreen(stage.getBoundingClientRect())) { p.req = null; return; }
@@ -258,6 +259,12 @@ window.STORY_MOTION = (() => {
     p.pause = () => { p.req = null; if (p.tl && !p.tl.paused()) p.tl.pause(); };
     p.resume = () => { if (p.tl && p.played && p.tl.paused() && p.tl.progress() < 1) p.tl.resume(); };
     replay?.addEventListener('click', () => p.play());
+    // back to the last frame and forgotten, for a diagram that's leaving the page
+    p.destroy = () => {
+      p.dead = true; p.near = p.vis = p.inView = false;
+      p.stop(); players.delete(stage);
+      if (near) { near.unobserve(stage); seen.unobserve(stage); }
+    };
     players.set(stage, p);
     if (near) { near.observe(stage); seen.observe(stage); }
     applyMotion(p);
@@ -308,15 +315,32 @@ window.STORY_MOTION = (() => {
   addEventListener('resize', () => { if (!queued) { queued = true; requestAnimationFrame(remeasure); } });
   document.fonts?.ready.then(remeasure);
 
-  const replayBtn = label => `<button class="sm-replay" type="button" aria-label="Replay animation: ${label}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 2v8L7 6z" fill="currentColor"/></svg></button>`;
+  const replayBtn = (label, cls = 'sm-replay') => `<button class="${cls}" type="button" aria-label="Replay animation: ${label}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 2v8L7 6z" fill="currentColor"/></svg></button>`;
 
   // ---------- the homepage: swap three story covers' drawings and animate the PeerPrep panel ----------
   // Runs once js/app.js has drawn the page and css/story-motion.css has arrived. A story card is a button, so its Replay
   // can't go inside it: the card moves into a cell with Replay stacked over its top-right corner, and the cell takes the
   // card's place in the grid.
-  const stories = HOME.filter(id => designs[id].kind === 'story');
+  const stories = ['stripe', 'llm', 'formulas'];
+  const titleOf = id => (window.ME?.experience.case_studies.find(s => s.id === id) || {}).title || id;
+  // the PeerPrep panel, wherever it's drawn: its marks and dots, and Replay in its header
+  function panel(pv) {
+    pv.classList.add('sm-pp');
+    const flow = designs.peerprep.augment(pv.querySelector('.flow'));
+    pv.querySelector('.visual-head').insertAdjacentHTML('beforeend', replayBtn('PeerPrep gateway', 'pv-replay'));
+    return player(flow, 'peerprep', pv.querySelector('.pv-replay'));
+  }
+  // a story's own page: the diagram goes where its cover drawing was, played by the given Replay. sm-cover lets a phone's
+  // cover keep room for it above the title. Nothing changes for a story without one, or before the styles are here.
+  function cover(c, id, replay) {
+    const svg = c.querySelector(':scope > svg.art');
+    if (!api.ready || !stories.includes(id) || !svg) return null;
+    c.classList.add('sm-cover');
+    svg.insertAdjacentHTML('afterend', art(id)); svg.remove();
+    return player(c.querySelector('.sm-art'), id, replay);
+  }
   function mountHome() {
-    const titleOf = id => (window.ME?.experience.case_studies.find(s => s.id === id) || {}).title || id;
+    api.ready = true;
     stories.forEach(id => {
       const card = document.querySelector(`#storyList .story[data-id="${id}"]`), svg = card?.querySelector('.cover > svg.art');
       if (!svg) return;
@@ -332,12 +356,7 @@ window.STORY_MOTION = (() => {
       player(card.querySelector('.sm-art'), id, r);
     });
     const pv = document.querySelector('.project-feature[data-project="peerprep"] .project-visual');
-    if (pv) {
-      pv.classList.add('sm-pp');
-      const flow = designs.peerprep.augment(pv.querySelector('.flow'));
-      pv.querySelector('.visual-head').insertAdjacentHTML('beforeend', replayBtn('PeerPrep gateway').replace('sm-replay', 'pv-replay').replace('</svg>', '</svg><span>Replay</span>'));
-      player(flow, 'peerprep', pv.querySelector('.pv-replay'));
-    }
+    if (pv) panel(pv);
     // the cards behind Show all stories have no box to watch until it opens, so their start frames are set up as it
     // opens, before they paint. This listener runs after js/app.js's own, so the grid is already open. GSAP is fetched
     // once the button is pointed at or focused; if it isn't here by the click, they show finished until it arrives.
@@ -347,14 +366,6 @@ window.STORY_MOTION = (() => {
       ['pointerenter', 'touchstart', 'focus'].forEach(t => more.addEventListener(t, warm, { once: true, passive: true }));
       more.addEventListener('click', () => players.forEach(p => { if (p.stage.closest('.more') && p.stage.getClientRects().length) p.prime(); }));
     }
-    // the story's own page shows the same diagram, finished, where its cover drawing would be; sm-cover lets a phone's
-    // cover keep room for it above the title
-    const reader = document.getElementById('reader');
-    if (reader) new MutationObserver(() => {
-      const t = reader.querySelector('#r-title')?.textContent, svg = reader.querySelector('.cover > svg.art');
-      const id = stories.find(k => titleOf(k) === t);
-      if (id && svg) { svg.parentNode.classList.add('sm-cover'); svg.insertAdjacentHTML('afterend', art(id)); svg.remove(); }
-    }).observe(reader, { childList: true });
   }
 
   // The homepage loads this file async, straight after js/app.js, and asks for the mount with data-mount="home".
@@ -369,5 +380,5 @@ window.STORY_MOTION = (() => {
     if (ready()) go(); else css?.addEventListener('load', go, { once: true });
   }
 
-  return { designs, art, player, replayBtn, motionOn, mountHome, players, HOME };
+  return Object.assign(api, { panel, cover });
 })();

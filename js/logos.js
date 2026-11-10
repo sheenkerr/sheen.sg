@@ -63,5 +63,5 @@ window.LOGOS = (() => {
     if (MONO[s] && MONO[s][0].length <= 3) return `<span class="mono" style="--b:${MONO[s][1]};--f:${MONO[s][2]}" aria-hidden="true">${esc(MONO[s][0])}</span>`;
     return '';
   }
-  return { DI, MONO, SAME, src, logo };
+  return { logo, esc };
 })();

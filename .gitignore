@@ -10,5 +10,8 @@ __pycache__/
 # Keep README files locally rather than in the public repository
 [Rr][Ee][Aa][Dd][Mm][Ee]*
 
+# Agent maintenance notes stay on this machine; carry them to the other PC by hand
+/AGENTS.md
+
 # Token import scripts and tests are used only on this machine
 /tools/usage/

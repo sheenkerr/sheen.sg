@@ -5,17 +5,19 @@
   const section = $('tokens');
   const NS = 'http://www.w3.org/2000/svg';
   const CATS = [['all', 'All tokens'], ['uncachedInput', 'Uncached input'], ['cacheRead', 'Cache reads'], ['cacheWrite', 'Cache writes'], ['output', 'Output']];
-  const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumSignificantDigits: 3 });
-  const short = n => compact.format(n);
+  const CAT_NAME = Object.fromEntries(CATS);
+  const short = new Intl.NumberFormat('en', { notation: 'compact', maximumSignificantDigits: 3 }).format;
+  const sum = list => list.reduce((a, b) => a + b, 0);
+  const clamp = (n, low, high) => Math.min(high, Math.max(low, n));
   const exact = n => n.toLocaleString('en');
   const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
   // dates are already Singapore days, so they're written from the string; MONTHS is app.js's, which says Sep, not Sept
   const month = day => MONTHS[Number(day.slice(5, 7)) - 1];
   const dayName = day => `${Number(day.slice(8, 10))} ${month(day)} ${day.slice(0, 4)}`;
   // each tool's mark, as T3 Code shows it: Claude's in its orange, OpenAI's for Codex in the text colour of each mode
-  const LOGOS = { claude: ['images/brands/claude.svg', ''], codex: ['images/brands/openai.svg', ' ink'], antigravity: ['images/brands/antigravity.png', ''] };
-  const logo = id => LOGOS[id]
-    ? el('img', { class: `tool-logo${LOGOS[id][1]}`, src: LOGOS[id][0], width: 14, height: 14, alt: '' })
+  const TOOL_LOGOS = { claude: ['images/brands/claude.svg', ''], codex: ['images/brands/openai.svg', ' ink'], antigravity: ['images/brands/antigravity.png', ''] };
+  const logo = id => TOOL_LOGOS[id]
+    ? el('img', { class: `tool-logo${TOOL_LOGOS[id][1]}`, src: TOOL_LOGOS[id][0], width: 14, height: 14, alt: '' })
     : el('i', { class: 'key', 'aria-hidden': 'true' });
   const el = (tag, attrs = {}, text) => {
     const e = tag in { svg: 1, g: 1, rect: 1, path: 1, line: 1, text: 1 } ? document.createElementNS(NS, tag) : document.createElement(tag);
@@ -62,29 +64,29 @@
     // index.html shows it from the first paint with a label of about the same width, so the count replaces that label
     // without moving the line; the exact count and its days go in the title
     const last30 = data.daily.slice(-30);
-    const recent = last30.reduce((sum, day) => sum + tools.reduce((a, tool) => a + day[tool.id].reduce((x, y) => x + y, 0), 0), 0);
-    const burn = $('burn');
+    const recent = sum(last30.map(day => sum(tools.map(tool => sum(day[tool.id])))));
     $('burnText').replaceChildren(el('b', {}, short(recent)), ' tokens', el('span', { 'aria-hidden': 'true' }, ' · past 30d'), el('span', { class: 'sr' }, ' in the past 30 days'));
-    if (last30.length) burn.title = `${exact(recent)} tokens from ${dayName(last30[0].day)} to ${dayName(last30[last30.length - 1].day)}. See them by day.`;
-
+    if (last30.length) $('burn').title = `${exact(recent)} tokens from ${dayName(last30[0].day)} to ${dayName(last30.at(-1).day)}. See them by day.`;
 
     // ---------- the daily chart ----------
     // T3's 7, 30 and 90 day windows, plus everything recorded; a window only shows when there's more history than it covers
-    // `only` is the tool picked in the legend, or null for every tool
-    let metric = 'all', range = 0, only = null;
-    const valueOf = (day, tool) => metric === 'all' ? day[tool].reduce((a, b) => a + b, 0) : day[tool][cats.indexOf(metric)];
-    const used = day => tools.some(tool => day[tool.id].some(Boolean));
-    const inUse = list => tools.filter(tool => list.some(d => d[tool.id].some(Boolean)));
+    // `only` is the tool picked in the legend, or null for every tool; the chart opens on 30 days, like the pill
+    let metric = 'all', range = data.daily.length > 30 ? 30 : 0, only = null;
+    const valueOf = (day, tool) => metric === 'all' ? sum(day[tool]) : day[tool][cats.indexOf(metric)];
+    // whether a day has any usage from the given tools
+    const usedBy = which => day => which.some(tool => day[tool.id].some(Boolean));
+    const inUse = list => tools.filter(tool => list.some(usedBy([tool])));
     const counted = list => inUse(list).filter(tool => !only || tool.id === only);
     // a period starts on its first day with any usage, so the chart never opens on an empty stretch; the start doesn't
     // move when the token type changes
+    const period = () => range ? data.daily.slice(-range) : data.daily;
     function days() {
-      const list = range ? data.daily.slice(-range) : data.daily, first = list.findIndex(used);
+      const list = period(), first = list.findIndex(usedBy(tools));
       return first > 0 && list.length - first > 1 ? list.slice(first) : list;
     }
     const pickMetric = seg($('usageMetric'), CATS, metric, v => { metric = v; figures(); draw(); });
     $('usageRange').hidden = false;
-    const pickRange = seg($('usageRange'), [...[7, 30, 90].filter(n => data.daily.length > n).map(n => [n, `${n} days`]), [0, 'All']], range, v => {
+    seg($('usageRange'), [...[7, 30, 90].filter(n => data.daily.length > n).map(n => [n, `${n} days`]), [0, 'All']], range, v => {
       range = v;
       // a picked tool that wasn't used in the new period would leave nothing to draw
       if (only && !inUse(days()).some(tool => tool.id === only)) only = null;
@@ -96,12 +98,11 @@
     // a figure picks its type for the chart too.
     const share = (n, of) => { const s = of ? n / of * 100 : 0; return `${s < 1 && s > 0 ? s.toFixed(1) : Math.round(s)}%`; };
     function figures() {
-      const list = range ? data.daily.slice(-range) : data.daily, which = counted(list);
-      const sums = cats.map((_, i) => list.reduce((sum, day) => sum + which.reduce((a, tool) => a + day[tool.id][i], 0), 0));
-      const total = sums.reduce((a, b) => a + b, 0);
-      const period = `${only ? `${which[0].name}, ` : ''}${range ? `last ${range} days` : `since ${since}`}`;
+      const list = period(), which = counted(list);
+      const sums = cats.map((_, i) => sum(list.map(day => sum(which.map(tool => day[tool.id][i])))));
+      const total = sum(sums);
+      const span = `${only ? `${which[0].name}, ` : ''}${range ? `last ${range} days` : `since ${since}`}`;
       const chosen = metric === 'all' ? total : sums[cats.indexOf(metric)];
-      const name = CATS.find(c => c[0] === metric)[1];
       const tile = (cls, value, label, note, type) => {
         const b = el('button', { class: cls, type: 'button', 'aria-pressed': type === metric, title: `${exact(value)} tokens` });
         b.append(el('span', { class: 'usage-label' }, label), el('b', {}, short(value)), el('span', { class: 'usage-note' }, note));
@@ -109,8 +110,8 @@
         return b;
       };
       $('usageFigures').replaceChildren(
-        tile('usage-total', chosen, `${metric === 'all' ? 'Total' : name}, ${period}`, metric === 'all' ? 'tokens' : `tokens, ${share(chosen, total)} of all`, 'all'),
-        ...cats.map((c, i) => tile('usage-tile', sums[i], CATS.find(x => x[0] === c)[1], `${share(sums[i], total)} of all`, c)));
+        tile('usage-total', chosen, `${metric === 'all' ? 'Total' : CAT_NAME[metric]}, ${span}`, metric === 'all' ? 'tokens' : `tokens, ${share(chosen, total)} of all`, 'all'),
+        ...cats.map((c, i) => tile('usage-tile', sums[i], CAT_NAME[c], `${share(sums[i], total)} of all`, c)));
     }
     figures();
 
@@ -198,11 +199,11 @@
         li.append(b);
         return li;
       }));
-      $('usageDaysCount').textContent = plural(list.filter(d => shown.some(tool => d[tool.id].some(Boolean))).length, 'day');
+      $('usageDaysCount').textContent = plural(list.filter(usedBy(shown)).length, 'day');
       periods = list.map(d => d.day);
       columns = list.map(d => {
         const bands = shown.map(tool => ({ tool, value: valueOf(d, tool.id) }));
-        return { bands, total: bands.reduce((sum, band) => sum + band.value, 0) };
+        return { bands, total: sum(bands.map(band => band.value)) };
       });
       // Layered series each start at zero; summing peaks would waste plot height.
       const peak = columns.reduce((max, c) => c.bands.reduce((inner, band) => Math.max(inner, band.value), max), 0);
@@ -218,13 +219,13 @@
       const middle = periods[Math.floor(periods.length / 2)];
       $('usageX').replaceChildren(...[periods[0], middle, periods.at(-1)].map(p => el('span', {}, p ? formatDayShort(p) : '')));
 
-      const metricName = CATS.find(c => c[0] === metric)[1].toLowerCase();
+      const metricName = CAT_NAME[metric].toLowerCase();
       const svg = el('svg', { viewBox: `0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`, preserveAspectRatio: 'none', role: 'img',
         'aria-label': `Daily ${metricName} ${only ? `for ${shown[0].name}` : 'by tool'}, ${dayName(periods[0])} to ${dayName(periods.at(-1))}. Use the arrow keys to read each day; the figures are also in the Daily figures table.` });
       scale.ticks.forEach(tick => svg.append(el('line', { class: 'grid', x1: 0, x2: VIEW_WIDTH, y1: toY(tick), y2: toY(tick), 'vector-effect': 'non-scaling-stroke' })));
       const paths = shown.map((tool, slot) => {
         const line = curvePath(columns.map((c, i) => ({ x: i * stepX, y: toY(c.bands[slot].value) })));
-        return { tool, line, total: columns.reduce((sum, c) => sum + c.bands[slot].value, 0),
+        return { tool, line, total: sum(columns.map(c => c.bands[slot].value)),
           area: line && `${line} L${VIEW_WIDTH},${VIEW_HEIGHT} L0,${VIEW_HEIGHT} Z` };
       }).sort((a, b) => b.total - a.total);
       paths.forEach(p => svg.append(el('path', { class: `area ${p.tool.id}`, d: p.area })));
@@ -261,14 +262,14 @@
       const gap = 12, w = tip.offsetWidth, h = tip.offsetHeight, pw = plot.clientWidth, ph = plot.clientHeight;
       const { x, y } = at || { x: periods.length < 2 ? 0 : i / (periods.length - 1) * pw, y: 0 };
       const left = x + gap + w <= pw ? x + gap : x - gap - w, top = y + gap + h <= ph ? y + gap : y - gap - h;
-      tip.style.left = `${Math.min(Math.max(0, left), Math.max(0, pw - w))}px`;
-      tip.style.top = `${Math.min(Math.max(0, top), Math.max(0, ph - h))}px`;
+      tip.style.left = `${clamp(left, 0, Math.max(0, pw - w))}px`;
+      tip.style.top = `${clamp(top, 0, Math.max(0, ph - h))}px`;
     }
     function selectAtPointer(e) {
       const bounds = plot.getBoundingClientRect();
       if (!periods.length || !bounds.width) return;
-      const x = Math.min(bounds.width, Math.max(0, e.clientX - bounds.left)), y = Math.min(bounds.height, Math.max(0, e.clientY - bounds.top));
-      select(Math.min(periods.length - 1, Math.max(0, Math.round(x / bounds.width * (periods.length - 1)))), { x, y });
+      const x = clamp(e.clientX - bounds.left, 0, bounds.width), y = clamp(e.clientY - bounds.top, 0, bounds.height);
+      select(clamp(Math.round(x / bounds.width * (periods.length - 1)), 0, periods.length - 1), { x, y });
     }
     plot.addEventListener('pointermove', selectAtPointer);
     plot.addEventListener('click', selectAtPointer);
@@ -278,38 +279,32 @@
       if (e.key === 'Escape') return select(-1);
       if (n === undefined) return;
       e.preventDefault();
-      select(e.key === 'Home' ? 0 : Math.max(0, Math.min(periods.length - 1, active < 0 ? periods.length - 1 : active + n)));
+      select(e.key === 'Home' ? 0 : clamp(active < 0 ? periods.length - 1 : active + n, 0, periods.length - 1));
     });
     plot.addEventListener('blur', () => select(-1));
+    // a table with its caption and column names; the rows go in its tBodies[0]
+    function grid(attrs, caption, columns) {
+      const tbl = el('table', attrs);
+      tbl.append(el('caption', { class: 'sr' }, caption), el('thead'), el('tbody'));
+      tbl.tHead.append(el('tr'));
+      tbl.tHead.rows[0].append(...columns.map(h => el('th', { scope: 'col' }, h)));
+      return tbl;
+    }
     function table() {
-      const shown = counted(days());
-      const list = days().filter(d => shown.some(tool => d[tool.id].some(Boolean))).reverse();
-      const tbl = el('table'), head = el('tr');
-      ['Day', ...shown.map(x => x.name), 'Total'].forEach(h => head.append(el('th', { scope: 'col' }, h)));
-      tbl.append(el('caption', { class: 'sr' }, `${CATS.find(c => c[0] === metric)[1]} on each day with usage`), el('thead'), el('tbody'));
-      tbl.tHead.append(head);
+      const all = days(), shown = counted(all), list = all.filter(usedBy(shown)).reverse();
+      const tbl = grid({}, `${CAT_NAME[metric]} on each day with usage`, ['Day', ...shown.map(x => x.name), 'Total']);
       list.forEach(d => {
         const tr = el('tr'), vals = shown.map(x => valueOf(d, x.id));
-        tr.append(el('th', { scope: 'row' }, dayName(d.day)), ...[...vals, vals.reduce((a, b) => a + b, 0)].map(v => el('td', {}, exact(v))));
+        tr.append(el('th', { scope: 'row' }, dayName(d.day)), ...[...vals, sum(vals)].map(v => el('td', {}, exact(v))));
         tbl.tBodies[0].append(tr);
       });
       $('usageDays').replaceChildren(list.length ? tbl : el('p', { class: 'usage-note' }, 'No usage in this period.'));
     }
     draw();
 
-    // The pill links to the section like the Tokens tab, and sets the chart to its same days, all tools and all tokens,
-    // so the total there matches the pill.
-    burn.addEventListener('click', () => {
-      only = null;
-      pickMetric('all');
-      pickRange(data.daily.length > 30 ? 30 : 0);
-    });
-
     // ---------- by model, all time ----------
-    const tbl = el('table', { class: 'usage-models' }), head = el('tr');
-    ['Model', 'Tool', ...cats.map(c => CATS.find(x => x[0] === c)[1]), 'Total'].forEach(h => head.append(el('th', { scope: 'col' }, h)));
-    tbl.append(el('caption', { class: 'sr' }, `Tokens by model since ${since}`), el('thead'), el('tbody'), el('tfoot'));
-    tbl.tHead.append(head);
+    const tbl = grid({ class: 'usage-models' }, `Tokens by model since ${since}`, ['Model', 'Tool', ...cats.map(c => CAT_NAME[c]), 'Total']);
+    tbl.append(el('tfoot'));
     const cell = n => el('td', { title: `${exact(n)} tokens` }, short(n));
     data.models.forEach(m => {
       const tr = el('tr'), tool = el('td'), toolInfo = tools.find(x => x.name === m.tool);

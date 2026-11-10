@@ -1,5 +1,6 @@
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const { logo } = LOGOS;
+const { logo, esc } = LOGOS;
+// a technology with its mark, in a featured project's stack and the reader's chips
+const chip = s => `<li>${logo(s)}${esc(s)}</li>`;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 function yearMonth(date) {
   return `${MONTHS[Number(date.slice(5, 7)) - 1]} ${date.slice(0, 4)}`;
@@ -17,43 +18,37 @@ const prodMark = (p, cls = '') => `<img${cls ? ` class="${cls}"` : ''} src="imag
 document.querySelectorAll('.prod').forEach(el => el.insertAdjacentHTML('afterbegin', prodMark(el.textContent.trim())));
 
 // ---------- covers: a drawing of what the story is about, in its product's colours ----------
-const look = {
-  stripe: 'live', abuse: 'fourth', deploy: 'pipeline', data: 'json', formulas: 'formula', signup: 'background', access: 'authenticator',
-  llm: 'fallback', mentor: 'team', echelon: 'booth',
-  peerprep: 'gateway', sqlancer: 'chart', orbital: 'focus', bizbook: 'table',
-};
 // every drawing keeps to one 224 × 150 frame (x 210–434, y 36–186) and fills it, so it's as big as the space allows
 const ART_STROKE = 'fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" pathLength="1"';
 function person(x, y, r, w, opacity = 1) {
   return `<circle cx="${x}" cy="${y}" r="${r}" ${ART_STROKE} opacity="${opacity}"/><path d="M${x - w} ${y + r + w + 4}a${w} ${w} 0 0 1 ${w * 2} 0" ${ART_STROKE} opacity="${opacity}"/>`;
 }
+// keyed by the story's id (and PeerPrep's, the one project without a mark of its own)
 const DRAWINGS = {
   // Stripe billing: a payment card, filling the frame
-  live: `<rect x="234" y="46" width="180" height="114" rx="14" ${ART_STROKE}/><rect x="256" y="72" width="32" height="26" rx="5" ${ART_STROKE}/><path d="M256 124h30M298 124h30M340 124h30" ${ART_STROKE}/><path d="M256 140h56" ${ART_STROKE} opacity=".55"/>`,
+  stripe: `<rect x="234" y="46" width="180" height="114" rx="14" ${ART_STROKE}/><rect x="256" y="72" width="32" height="26" rx="5" ${ART_STROKE}/><path d="M256 124h30M298 124h30M340 124h30" ${ART_STROKE}/><path d="M256 140h56" ${ART_STROKE} opacity=".55"/>`,
   // the sign-up guard: three sign-ups go through, the fourth is stopped
-  fourth: `${person(236, 82, 11, 18)}${person(288, 82, 11, 18)}${person(340, 82, 11, 18)}${person(400, 82, 11, 18, .55)}<circle cx="400" cy="100" r="32" ${ART_STROKE}/><path d="M377 123l46-46" ${ART_STROKE}/>`,
+  abuse: `${person(236, 82, 11, 18)}${person(288, 82, 11, 18)}${person(340, 82, 11, 18)}${person(400, 82, 11, 18, .55)}<circle cx="400" cy="100" r="32" ${ART_STROKE}/><path d="M377 123l46-46" ${ART_STROKE}/>`,
   // a push builds a container and ships it to the cloud, with an arc over it all: nobody in the loop
-  pipeline: `<circle cx="234" cy="114" r="13" ${ART_STROKE}/><path d="M212 114h9M247 114h9M262 114h22M278 108l6 6-6 6" ${ART_STROKE}/><rect x="292" y="92" width="48" height="44" rx="6" ${ART_STROKE}/><path d="M292 106h48" ${ART_STROKE}/><path d="M348 114h16M358 108l6 6-6 6" ${ART_STROKE}/><path d="M416.8 112h-3.28A20.8 20.8 0 1 0 393.4 138h23.4a13 13 0 0 0 0-26z" ${ART_STROKE}/><path d="M234 92C236 52 398 52 400 84M394 78l6 6 6-6" ${ART_STROKE} opacity=".55"/>`,
+  deploy: `<circle cx="234" cy="114" r="13" ${ART_STROKE}/><path d="M212 114h9M247 114h9M262 114h22M278 108l6 6-6 6" ${ART_STROKE}/><rect x="292" y="92" width="48" height="44" rx="6" ${ART_STROKE}/><path d="M292 106h48" ${ART_STROKE}/><path d="M348 114h16M358 108l6 6-6 6" ${ART_STROKE}/><path d="M416.8 112h-3.28A20.8 20.8 0 1 0 393.4 138h23.4a13 13 0 0 0 0-26z" ${ART_STROKE}/><path d="M234 92C236 52 398 52 400 84M394 78l6 6 6-6" ${ART_STROKE} opacity=".55"/>`,
   // JSON blobs become tables
-  json: `<path d="M244 58c-10 0-12 6-12 14v18c0 6-4 10-10 10 6 0 10 4 10 10v18c0 8 2 14 12 14M262 58c10 0 12 6 12 14v18c0 6 4 10 10 10-6 0-10 4-10 10v18c0 8-2 14-12 14" ${ART_STROKE}/><path d="M296 100h26M316 94l6 6-6 6" ${ART_STROKE}/><rect x="336" y="52" width="96" height="96" rx="8" ${ART_STROKE}/><path d="M336 76h96M336 100h96M336 124h96M368 52v96M400 52v96" ${ART_STROKE} opacity=".55"/>`,
+  data: `<path d="M244 58c-10 0-12 6-12 14v18c0 6-4 10-10 10 6 0 10 4 10 10v18c0 8 2 14 12 14M262 58c10 0 12 6 12 14v18c0 6 4 10 10 10-6 0-10 4-10 10v18c0 8-2 14-12 14" ${ART_STROKE}/><path d="M296 100h26M316 94l6 6-6 6" ${ART_STROKE}/><rect x="336" y="52" width="96" height="96" rx="8" ${ART_STROKE}/><path d="M336 76h96M336 100h96M336 124h96M368 52v96M400 52v96" ${ART_STROKE} opacity=".55"/>`,
   // a formula, with the attributes it reads from linked to it, and the check that keeps those links valid
-  formula: `<rect x="222" y="54" width="112" height="60" rx="10" ${ART_STROKE}/><path d="M236 86h6l6 12 10-28h24M294 79h16M294 91h16" ${ART_STROKE}/><path d="M334 76c10 0 10-14 22-14M334 92c10 0 10 20 22 20" ${ART_STROKE} opacity=".55"/><rect x="356" y="50" width="76" height="26" rx="8" ${ART_STROKE}/><rect x="356" y="99" width="76" height="26" rx="8" ${ART_STROKE}/><rect x="356" y="148" width="76" height="26" rx="8" ${ART_STROKE} opacity=".55"/><circle cx="252" cy="152" r="18" ${ART_STROKE}/><path d="M243 152l6 6 12-13" ${ART_STROKE}/>`,
+  formulas: `<rect x="222" y="54" width="112" height="60" rx="10" ${ART_STROKE}/><path d="M236 86h6l6 12 10-28h24M294 79h16M294 91h16" ${ART_STROKE}/><path d="M334 76c10 0 10-14 22-14M334 92c10 0 10 20 22 20" ${ART_STROKE} opacity=".55"/><rect x="356" y="50" width="76" height="26" rx="8" ${ART_STROKE}/><rect x="356" y="99" width="76" height="26" rx="8" ${ART_STROKE}/><rect x="356" y="148" width="76" height="26" rx="8" ${ART_STROKE} opacity=".55"/><circle cx="252" cy="152" r="18" ${ART_STROKE}/><path d="M243 152l6 6 12-13" ${ART_STROKE}/>`,
   // the verification email goes straight through, and the demo catalogue loads in a queue behind it
-  background: `<rect x="222" y="58" width="94" height="64" rx="8" ${ART_STROKE}/><path d="M222 64l47 33 47-33" ${ART_STROKE}/><path d="M324 90h22M340 84l6 6-6 6" ${ART_STROKE}/><circle cx="380" cy="90" r="24" ${ART_STROKE}/><path d="M369 90l8 8 15-16" ${ART_STROKE}/><path d="M269 128c0 20 26 26 61 26" ${ART_STROKE} opacity=".55"/><rect x="338" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/><rect x="371" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/><rect x="404" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/>`,
+  signup: `<rect x="222" y="58" width="94" height="64" rx="8" ${ART_STROKE}/><path d="M222 64l47 33 47-33" ${ART_STROKE}/><path d="M324 90h22M340 84l6 6-6 6" ${ART_STROKE}/><circle cx="380" cy="90" r="24" ${ART_STROKE}/><path d="M369 90l8 8 15-16" ${ART_STROKE}/><path d="M269 128c0 20 26 26 61 26" ${ART_STROKE} opacity=".55"/><rect x="338" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/><rect x="371" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/><rect x="404" y="142" width="24" height="24" rx="5" ${ART_STROKE} opacity=".55"/>`,
   // a shield for the sign-up domain rules, and an authenticator code counting down for the admin sign-in
-  authenticator: `<path d="M262 50l40 14v34c0 28-18 46-40 56-22-10-40-28-40-56V64z" ${ART_STROKE}/><path d="M246 100l11 11 22-24" ${ART_STROKE}/><path d="M310 102h36" ${ART_STROKE} opacity=".55"/><rect x="356" y="44" width="66" height="118" rx="12" ${ART_STROKE}/><path d="M381 56h16" ${ART_STROKE} opacity=".55"/><path d="M368 88h10M384 88h10M400 88h10" ${ART_STROKE}/><path d="M368 104h10M384 104h10M400 104h10" ${ART_STROKE} opacity=".55"/><circle cx="389" cy="134" r="11" ${ART_STROKE} opacity=".3"/><path d="M389 123a11 11 0 1 1-11 11" ${ART_STROKE}/>`,
+  access: `<path d="M262 50l40 14v34c0 28-18 46-40 56-22-10-40-28-40-56V64z" ${ART_STROKE}/><path d="M246 100l11 11 22-24" ${ART_STROKE}/><path d="M310 102h36" ${ART_STROKE} opacity=".55"/><rect x="356" y="44" width="66" height="118" rx="12" ${ART_STROKE}/><path d="M381 56h16" ${ART_STROKE} opacity=".55"/><path d="M368 88h10M384 88h10M400 88h10" ${ART_STROKE}/><path d="M368 104h10M384 104h10M400 104h10" ${ART_STROKE} opacity=".55"/><circle cx="389" cy="134" r="11" ${ART_STROKE} opacity=".3"/><path d="M389 123a11 11 0 1 1-11 11" ${ART_STROKE}/>`,
   // a request goes to the chosen model, and falls back to the second when the first fails
-  fallback: `<circle cx="230" cy="110" r="10" ${ART_STROKE}/><path d="M240 110h30" ${ART_STROKE}/><path d="M288 92l18 18-18 18-18-18z" ${ART_STROKE}/><path d="M306 110c22 0 20-36 44-36M306 110c22 0 20 36 44 36" ${ART_STROKE}/><rect x="352" y="56" width="80" height="36" rx="8" ${ART_STROKE}/><rect x="352" y="128" width="80" height="36" rx="8" ${ART_STROKE} opacity=".55"/><path d="M392 98v22M386 114l6 6 6-6" ${ART_STROKE} opacity=".55"/>`,
+  llm: `<circle cx="230" cy="110" r="10" ${ART_STROKE}/><path d="M240 110h30" ${ART_STROKE}/><path d="M288 92l18 18-18 18-18-18z" ${ART_STROKE}/><path d="M306 110c22 0 20-36 44-36M306 110c22 0 20 36 44 36" ${ART_STROKE}/><rect x="352" y="56" width="80" height="36" rx="8" ${ART_STROKE}/><rect x="352" y="128" width="80" height="36" rx="8" ${ART_STROKE} opacity=".55"/><path d="M392 98v22M386 114l6 6 6-6" ${ART_STROKE} opacity=".55"/>`,
   // one person showing three new ones the ropes
-  team: `${person(242, 78, 16, 24)}${person(312, 96, 11, 17, .7)}${person(356, 96, 11, 17, .7)}${person(400, 96, 11, 17, .7)}`,
+  mentor: `${person(242, 78, 16, 24)}${person(312, 96, 11, 17, .7)}${person(356, 96, 11, 17, .7)}${person(400, 96, 11, 17, .7)}`,
   // a day at a booth: a pitch, and the demo on a screen beside it
-  booth: `<path d="M222 58h52a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10h-30l-16 14v-14h-6a10 10 0 0 1-10-10V68a10 10 0 0 1 10-10z" ${ART_STROKE}/><rect x="300" y="50" width="122" height="78" rx="8" ${ART_STROKE}/><path d="M318 74h50M318 90h72M318 106h36" ${ART_STROKE} opacity=".55"/><path d="M361 128v26M336 154h50" ${ART_STROKE}/>`,
-  gateway: `<path d="M300 40v140M300 110h-70M300 70h-70M300 150h-70" ${ART_STROKE} opacity=".55"/><rect x="290" y="40" width="20" height="140" rx="10" ${ART_STROKE}/><path d="M310 110h110" ${ART_STROKE}/><path d="M410 102l10 8-10 8" ${ART_STROKE}/>`,
-  chart: `<path d="M220 180h210M220 180V40" ${ART_STROKE} opacity=".55"/><path d="M230 160l40-30 40 18 40-62 40 22 30-40" ${ART_STROKE}/>`,
-  focus: `<circle cx="330" cy="110" r="70" ${ART_STROKE} opacity=".3"/><circle cx="330" cy="110" r="45" ${ART_STROKE} opacity=".6"/><circle cx="330" cy="110" r="18" ${ART_STROKE}/>`,
+  echelon: `<path d="M222 58h52a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10h-30l-16 14v-14h-6a10 10 0 0 1-10-10V68a10 10 0 0 1 10-10z" ${ART_STROKE}/><rect x="300" y="50" width="122" height="78" rx="8" ${ART_STROKE}/><path d="M318 74h50M318 90h72M318 106h36" ${ART_STROKE} opacity=".55"/><path d="M361 128v26M336 154h50" ${ART_STROKE}/>`,
+  peerprep: `<path d="M300 40v140M300 110h-70M300 70h-70M300 150h-70" ${ART_STROKE} opacity=".55"/><rect x="290" y="40" width="20" height="140" rx="10" ${ART_STROKE}/><path d="M310 110h110" ${ART_STROKE}/><path d="M410 102l10 8-10 8" ${ART_STROKE}/>`,
 };
-function art(kind) {
-  return `<svg class="art" viewBox="210 36 224 150" preserveAspectRatio="xMaxYMin meet" aria-hidden="true">${DRAWINGS[kind]}</svg>`;
+function art(id) {
+  return `<svg class="art" viewBox="210 36 224 150" preserveAspectRatio="xMaxYMin meet" aria-hidden="true">${DRAWINGS[id]}</svg>`;
 }
 // one product: the cover is filled with it; several: a plain cover with a ribbon of each; a project: its own colour
 // (cover, deep title, and a little deeper cover for dark mode)
@@ -84,7 +79,8 @@ function coverKind(item) {
   const products = productsOf(item);
   return products.length > 1 ? 'multi' : products[0].toLowerCase();
 }
-function cover(x, kicker) {
+// a featured project's page passes its diagram panel, which takes the place of the mark so the page opens on what the card showed
+function cover(x, kicker, visual = '') {
   const cls = coverKind(x);
   let ribbon = '', marks = '', style = '';
   if (cls === 'company') marks = '<img class="pm" src="images/orgs/nested.svg" width="26" height="26" alt="">';
@@ -94,7 +90,7 @@ function cover(x, kicker) {
     marks = ps.map(p => prodMark(p, 'pm')).join('');
     if (cls === 'multi') ribbon = `<span class="ribbon" aria-hidden="true">${ps.map(p => `<i style="--b:var(--${p.toLowerCase()})"></i>`).join('')}</span>`;
   }
-  return `<div class="cover ${cls}"${style}>${ribbon}${REPO_MARK[x.id] ? repoMark(x.id) : art(look[x.id])}${marks || kicker ? `<p class="kicker">${marks}${esc(kicker)}</p>` : ''}<h3>${esc(x.title)}</h3></div>`;
+  return `<div class="cover ${cls}${visual ? ' has-visual' : ''}"${style}>${ribbon}${visual || (REPO_MARK[x.id] ? repoMark(x.id) : art(x.id))}${marks || kicker ? `<p class="kicker">${marks}${esc(kicker)}</p>` : ''}<h3>${esc(x.title)}</h3></div>`;
 }
 
 const stories = ME.experience.case_studies.map(x => ({ ...x, kicker: x.product, group: 'work' }));
@@ -153,8 +149,6 @@ moreBtn.addEventListener('click', () => {
   // the newly shown covers draw themselves in as they arrive
   if (open) storyGrid.querySelector('.more')?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'nearest' });
 });
-// the toy draws its meter, state, log and buttons; here the meter moves onto a Mailmail cover with the title,
-// and the rest goes in the widget's foot
 // a cover is as tall as its title needs, so a three-line title would make one cover in a row taller than the rest;
 // every cover in a row takes the tallest one's height, so the line between cover and text stays level
 function levelCovers() {
@@ -175,9 +169,13 @@ function levelCovers() {
     covers.forEach(cover => { cover.style.minHeight = `${height}px`; });
   });
 }
-addEventListener('resize', levelCovers);
+// a drag-resize fires many times a frame; the covers are levelled once per frame
+let levelling = 0;
+addEventListener('resize', () => { levelling ||= requestAnimationFrame(() => { levelling = 0; levelCovers(); }); });
 document.fonts.ready.then(levelCovers);
 levelCovers();
+// the toy draws its meter, state, log and buttons; here the meter moves onto a Mailmail cover with the title,
+// and the rest goes in the widget's foot
 const guardRun = document.querySelector('[data-toy="guard"]');
 TOYS.guard(guardRun);
 const [guardMeter, ...guardRest] = guardRun.children;
@@ -198,7 +196,7 @@ const term = x => x.product.split(', ').pop();
 // each diagram is the project's cover now: its own colour, with its mark top right where the old cover wore it
 // FlowFox's and Virtual Vault's diagrams play once in view (js/project-motion.js), which also shows their Replay button
 // only where it can play. Their markup is the last frame; the wires and the shoppers are drawn in as each nears the screen.
-const replayBtn = what => `<button class="pv-replay" type="button" aria-label="Replay ${what}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 2v8L7 6z" fill="currentColor"/></svg><span>Replay</span></button>`;
+const replayBtn = what => `<button class="pv-replay" type="button" aria-label="Replay ${what}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 2v8L7 6z" fill="currentColor"/></svg></button>`;
 const visualHead = (id, label, replay) => `<div class="visual-head"><p class="visual-label">${label}</p>${replay ? replayBtn(replay) : ''}${REPO_MARK[id] ? repoMark(id) : ''}</div>`;
 const projectVisuals = {
   flowfox: `<div class="project-visual" data-pv="deploy" role="group" aria-label="FlowFox deployment architecture">
@@ -246,9 +244,9 @@ document.getElementById('projectFeatures').innerHTML = featuredProjects.map(x =>
         <p class="project-meta">${esc(term(x))}</p><h3 id="${x.id}-h">${esc(x.title)}</h3>
         <p class="project-role">My role: ${esc(x.feature.role)}</p><p class="project-summary">${esc(x.feature.summary)}</p>
         <p class="project-result"><b>${x.id === 'vault' ? 'The finding' : 'The result'}:</b> ${esc(x.feature.result)}</p>
-        <ul class="project-stack" aria-label="Selected technologies">${x.feature.stack.map(s => `<li>${logo(s)}${esc(s)}</li>`).join('')}</ul>
+        <ul class="project-stack" aria-label="Selected technologies">${x.feature.stack.map(chip).join('')}</ul>
         <div class="project-actions">
-          <button class="project-open" type="button" data-id="${x.id}">Explore project<span class="sr"> ${esc(x.title)}</span> <span aria-hidden="true">→</span></button>
+          <button class="project-open" type="button" data-id="${x.id}">Explore project<span class="sr"> ${esc(x.title)}</span></button>
           <a class="link project-repo" href="${esc(x.repo)}" target="_blank" rel="noopener" aria-label="View ${esc(x.title)} code on GitHub">${GH}View code</a>
         </div>
       </div>${projectVisuals[x.id] || ''}
@@ -258,7 +256,7 @@ document.getElementById('projectGrid').innerHTML = otherProjects.map(x => `
   <button class="project-small press" type="button" data-id="${x.id}" style="${tint(x.id)}" aria-label="Read about ${esc(x.title)}">
     <span class="project-small-head"><span><span class="project-meta">${esc(term(x))}</span><span class="project-small-title">${esc(x.title)}</span></span>
     ${REPO_MARK[x.id] ? `<span class="project-icon">${repoMark(x.id)}</span>` : ''}</span>
-    <span class="project-summary">${esc(x.summary)}</span><span class="project-more">Explore project <span aria-hidden="true">→</span></span>
+    <span class="project-summary">${esc(x.summary)}</span><span class="project-more">Explore project</span>
   </button>`).join('');
 
 // ---------- education ----------
@@ -283,7 +281,6 @@ document.querySelectorAll('.story svg.art').forEach(svg => { prep(svg); if (!sti
 const reader = document.getElementById('reader');
 // an event in GoatCounter; it isn't there while its script loads or when a blocker stops it, and then nothing is counted
 const track = (path, title) => window.goatcounter?.count?.({ path, title, event: true });
-const chip = s =>`<li>${logo(s)}${esc(s)}</li>`;
 let fromEl = null;
 // previous and next follow the page: stories as the stack lays them out, then featured projects and the rest;
 // the first has no previous and the last no next, so neither loops
@@ -293,9 +290,10 @@ function fill(x) {
   const list = order[x.group], i = list.indexOf(x), prev = list[i - 1], next = list[i + 1];
   const noun = x.group === 'work' ? 'story' : 'project';
   track(`${noun}/${x.id}`, x.title);
+  stopMotion();
   reader.innerHTML = `
     <button class="close" type="button" aria-label="Close story"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-    ${cover(x, x.kicker).replace('<h3>', '<h3 id="r-title">')}
+    ${cover(x, x.kicker, x.group === 'proj' && projectVisuals[x.id]).replace('<h3>', '<h3 id="r-title">')}
     <div class="body">
       ${x.module ? `<p class="r-mod">${esc(x.module)}</p>` : ''}<p class="lead">${esc(x.summary)}</p>
       <h4>The problem</h4><p>${esc(x.problem)}</p>
@@ -310,13 +308,43 @@ function fill(x) {
         ${next ? `<button class="next" type="button" data-go="${next.id}"><span>Next ${noun}${chev('M6 3l5 5-5 5')}</span><b>${esc(next.title)}</b></button>` : ''}
       </nav>
     </div>`;
-  const ra = reader.querySelector('svg.art'); if (ra) { prep(ra); if (!still) ra.classList.add('draw'); }
+  // a drawing gets the same Replay as a diagram, beside the cover's kicker, clear of the close button
+  if (reader.querySelector('.cover > svg.art')) reader.querySelector('.cover .kicker').insertAdjacentHTML('beforeend', replayBtn(`animation: ${esc(x.title)}`));
   reader.querySelector('.close').addEventListener('click', closeStory);
   reader.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => {
     const y = list.find(z => z.id === b.dataset.go);
-    fill(y); reader.scrollTop = 0; reader.querySelector('.close').focus();
+    fill(y); reader.scrollTop = 0; startMotion(y); reader.querySelector('.close').focus();
     fromEl = document.querySelector(`.story[data-id="${y.id}"]`) || document.querySelector(`[data-id="${y.id}"]`);
   }));
+}
+// ---------- the open page's motion: its cover plays once as the page opens, and Replay plays it again ----------
+// Every source hands back { play, destroy }: FlowFox's and Virtual Vault's panels (js/project-motion.js), PeerPrep's panel
+// and three stories' diagrams (js/story-motion.js), and any other story's drawing, which draws itself in again. Without
+// its script, or with motion off, the cover keeps its finished frame and Replay stays hidden. Leaving the page, or
+// moving to the next one, ends a run on its last frame and lets go of its observers.
+let motion = [];
+function stopMotion() { motion.forEach(m => m.destroy()); motion = []; }
+function drawIn(svg, replay) {
+  prep(svg);
+  const play = () => { if (still) return; svg.classList.remove('draw'); svg.getBoundingClientRect(); svg.classList.add('draw'); };
+  replay.hidden = still;
+  replay.addEventListener('click', play);
+  return { play, destroy() {} };
+}
+// called once the page is open and laid out, so a panel's wires and dots are measured from its real boxes
+function startMotion(x) {
+  stopMotion();
+  const c = reader.querySelector('.cover'), pv = c.querySelector('.project-visual'), replay = c.querySelector('.kicker > .pv-replay');
+  let m = null;
+  if (pv?.dataset.pv) m = window.PROJECT_MOTION?.mount(pv, { auto: false });
+  else if (pv && x.id === 'peerprep' && window.STORY_MOTION?.ready) m = STORY_MOTION.panel(pv);
+  else if (replay) {
+    m = window.STORY_MOTION?.cover(c, x.id, replay);
+    const svg = c.querySelector(':scope > svg.art');
+    if (!m && svg) m = drawIn(svg, replay);
+    if (!m) replay.remove();
+  }
+  if (m) { motion.push(m); m.play(); }
 }
 function transition(update) {
   if (!document.startViewTransition || still) { update(); return Promise.resolve(); }
@@ -324,7 +352,9 @@ function transition(update) {
 }
 // a widget with a cover morphs into the story; a text link just opens it.
 // A featured project's coloured diagram is its cover, so that is what grows into the page.
+// The page shows that same panel on its cover, so the panel grows into itself, on the same colour.
 const coverOf = el => el.querySelector('.cover') || el.closest('.project-feature')?.querySelector('.project-visual');
+const readerCover = () => reader.querySelector('.cover .project-visual') || reader.querySelector('.cover');
 function openStory(el) {
   const x = all.find(y => y.id === el.dataset.id); if (!x) return;
   if (el.closest('.n-grid:not(.open) .more')) return;
@@ -333,17 +363,17 @@ function openStory(el) {
   if (c) c.style.viewTransitionName = 'story-cover';
   transition(() => {
     if (c) c.style.viewTransitionName = '';
-    fill(x); reader.showModal(); reader.scrollTop = 0;
-    if (c) reader.querySelector('.cover').style.viewTransitionName = 'story-cover';
-  }).finally(() => { const rc = reader.querySelector('.cover'); if (rc) rc.style.viewTransitionName = ''; reader.querySelector('.close').focus(); });
+    fill(x); reader.showModal(); reader.scrollTop = 0; startMotion(x);
+    if (c) readerCover().style.viewTransitionName = 'story-cover';
+  }).finally(() => { const rc = readerCover(); if (rc) rc.style.viewTransitionName = ''; reader.querySelector('.close').focus(); });
 }
 function closeStory() {
-  const rc = reader.querySelector('.cover'), c = fromEl && coverOf(fromEl);
+  const rc = readerCover(), c = fromEl && coverOf(fromEl);
   const morph = c && reader.scrollTop < 200;
   if (morph) rc.style.viewTransitionName = 'story-cover';
   transition(() => {
     if (rc) rc.style.viewTransitionName = '';
-    reader.close();
+    reader.close(); stopMotion();
     if (morph) c.style.viewTransitionName = 'story-cover';
   }).finally(() => { if (c) c.style.viewTransitionName = ''; fromEl?.focus(); });
 }

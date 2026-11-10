@@ -25,9 +25,9 @@
     --me: #d9f37a;
     --me-ink: #101418;
     --close: #eef8cc; --close-ink: var(--heading);
-    --work: #8dbbff; --work-soft: #e2edff; --work-ink: #1d4e8f;
-    --proj: #ff9fbb; --proj-soft: #ffe4eb; --proj-ink: #962247;
-    --study: #b9a6ff; --study-soft: #ece8ff; --study-ink: #4f35a3;
+    --work-soft: #e2edff; --work-ink: #1d4e8f;
+    --proj-soft: #ffe4eb; --proj-ink: #962247;
+    --study-soft: #ece8ff; --study-ink: #4f35a3;
     --nested-soft: #fff3bd;
     /* Julia wears its logo, navy on cream, in both modes */
     --julia: #fef7ec; --julia-ink: #002645;
@@ -233,7 +233,7 @@
   /* every project keeps the colour its cover had: the diagram panel and the small cards' icon wear it, in its ink, in both themes */
   .project-feature, .project-small { --cv: var(--pc); }
   .project-feature { position: relative; min-width: 0; padding: 24px; border-radius: 22px; background: var(--raised); box-shadow: var(--lift); transition: transform .18s ease, box-shadow .18s ease; }
-  .project-main { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+  .project-main { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
   .project-copy { min-width: 0; }
   .project-meta { display: block; margin: 0 0 8px; color: var(--secondary); font-size: 0.8125rem; }
   .project-feature h3 { margin: 0; color: var(--heading); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; }
@@ -250,7 +250,7 @@
   .project-visual { min-width: 0; padding: 20px; border-radius: 18px; background: var(--cv); color: var(--pi); }
   .visual-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; margin-bottom: 12px; }
   .project-visual .rmark { flex: none; width: 48px; height: 48px; object-fit: contain; }
-  .visual-label { margin: 0; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .visual-label { margin: 0; font-family: var(--display); font-size: 0.9375rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
   /* the architecture diagrams: every step is the same left-aligned box, joined to the one before it by a line. A fork splits
      the line across the steps that run side by side, and the step after a fork joins them again. A filled step is the part I
      built, where only part of it was mine. */
@@ -296,13 +296,11 @@
   .pv-replay, .sm-replay { box-sizing: border-box; display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent); cursor: pointer; }
   .pv-replay svg, .sm-replay svg { display: block; flex: none; width: 18px; height: 18px; }
   .pv-replay:focus-visible, .sm-replay:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-  .pv-replay span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   @media (pointer: coarse) { .pv-replay, .sm-replay { width: 44px; height: 44px; } }
   .pv-replay {
     position: relative; z-index: 1; margin-left: auto;
     background: color-mix(in srgb, currentColor 12%, transparent); color: inherit; font: inherit;
   }
-  .pv-replay[hidden] { display: none; }
   .pv-replay:hover { background: color-mix(in srgb, currentColor 20%, transparent); }
   /* the story's cover grows out of a snapshot of this panel, and Replay stays behind */
   .project-visual[style*="story-cover"] .pv-replay { visibility: hidden; }
@@ -376,10 +374,7 @@
   /* side by side, both columns get too narrow for a fork of three below about 900px, so the diagram goes under the copy */
   @media (max-width: 900px) { .project-main { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
   @media (max-width: 700px) { .project-grid { grid-template-columns: minmax(0, 1fr); } }
-  @media (pointer: coarse) {
-    .project-repo { min-height: 44px; }
-    .project-open { min-height: 44px; }
-  }
+  @media (pointer: coarse) { .project-repo, .project-open { min-height: 44px; } }
 
   .edu li { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: 14px; }
   .edu .crest { grid-column: 2; grid-row: 1 / span 4; justify-self: end; width: 104px; height: 48px; object-fit: contain; object-position: right center; }
@@ -388,12 +383,12 @@
 
 
   /* ---------- Nested: one yellow stack holding its stories and the toy ---------- */
-  .nested { grid-column: 1 / -1; color: var(--nested-text, inherit); background: var(--nested-soft); border-radius: 36px; padding: 12px; }
+  .nested { grid-column: 1 / -1; background: var(--nested-soft); border-radius: 36px; padding: 12px; }
   .n-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 16px 16px 20px; }
   .n-head .mark { grid-row: 1 / span 2; width: 60px; height: 60px; border-radius: 14px; }
-  .n-head h2 { margin: 0; color: var(--nested-text, var(--heading)); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
-  .n-head .role { color: var(--nested-muted, var(--secondary)); font-size: 0.9375rem; font-weight: 600; }
-  .n-head p { grid-column: 1 / -1; margin: 10px 0 0; max-width: 54em; }
+  .n-head h2 { margin: 0; color: var(--heading); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .n-head .role { color: var(--secondary); font-size: 0.9375rem; font-weight: 600; }
+  .n-head p { grid-column: 1 / -1; margin: 10px 0 0; max-width: 38em; text-wrap: balance; }
   /* a product named in running text carries its mark */
   .prod { white-space: nowrap; font-weight: 700; }
   .prod img { width: 1.25em; height: 1.25em; margin-right: 4px; vertical-align: -0.28em; object-fit: contain; }
@@ -428,7 +423,8 @@
   /* a repo's own mark sits where a drawing would, top right */
   .cover .rmark { position: absolute; top: 16px; right: 16px; width: 76px; height: 76px; object-fit: contain; }
   .rmark.stencil { background: currentColor; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
-  .reader .cover .rmark { top: 28px; right: 28px; width: clamp(110px, 22vw, 160px); height: clamp(110px, 22vw, 160px); }
+  /* the story page's close button floats over the cover's top-right corner, so the mark sits just left of it */
+  .reader .cover .rmark { top: 28px; right: 72px; width: clamp(110px, 22vw, 160px); height: clamp(110px, 22vw, 160px); }
   .story:not(.feat) .foot { flex: 1; align-content: start; }
   /* a story across products wears a ribbon of each, as on Bento */
   /* hairlines under and between the bands, so pale brands still read against a pale cover */
@@ -542,8 +538,8 @@
   /* T3 Code's chart: y labels in a 56px column, the plot stretched beside it, and the first, middle and last day under it */
   .usage-graph { display: flex; gap: 8px; margin-top: 8px; }
   .usage-y { position: relative; flex: none; width: 56px; height: 224px; }
-  .usage-y span { position: absolute; right: 0; translate: 0 -50%; color: var(--secondary); font-size: 0.625rem; font-variant-numeric: tabular-nums; }
-  .usage-x { display: flex; justify-content: space-between; margin-top: 4px; padding-left: 64px; color: var(--secondary); font-size: 0.625rem; text-transform: uppercase; }
+  .usage-y span { position: absolute; right: 0; translate: 0 -50%; color: var(--secondary); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  .usage-x { display: flex; justify-content: space-between; margin-top: 4px; padding-left: 64px; color: var(--secondary); font-size: 0.75rem; }
   .usage-plot { position: relative; flex: 1; min-width: 0; height: 224px; touch-action: pan-y; }
   .usage-plot svg { display: block; width: 100%; height: 100%; }
   /* a tap reads a day without a focus ring; the keyboard gets the site's own */
@@ -637,6 +633,14 @@
   .reader .cover { min-height: 360px; padding: 28px; }
   .reader .cover svg.art { inset: 28px 28px auto auto; width: calc(100% - 56px); height: 40%; }
   .reader .cover h3 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; letter-spacing: -0.03em; max-width: 16em; }
+  /* A featured project's page opens on the card's own diagram panel, in the cover's colour, so the two look the same and
+     the card's panel grows into it. The cover then only holds the panel and the title under it. Its header keeps clear
+     of the close button, and the steps stay at a readable width on a wide page. */
+  .reader .cover.has-visual { justify-content: flex-start; min-height: 0; }
+  .reader .cover > .project-visual { margin: -20px -20px 16px; }
+  .reader .cover > .project-visual .visual-head { padding-right: 40px; }
+  .reader .cover > .project-visual .rmark { position: static; width: 48px; height: 48px; }
+  .reader .cover > .project-visual > :not(.visual-head) { max-width: 600px; }
   .reader .close {
     position: sticky; top: 14px; float: right; margin: 14px 14px -58px 0; z-index: 3;
     width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center;
@@ -711,6 +715,10 @@
     .project-feature { padding: 18px; }
     .project-visual { padding: 16px; }
     .reader .cover { min-height: 280px; }
+    .reader .cover > .project-visual { margin: -16px -16px 12px; }
+    /* a drawing keeps a fixed 112px, and the cover keeps that room above a title of any length, as for a diagram */
+    .reader .cover svg.art { height: 112px; }
+    .reader .cover:has(> svg.art) { padding-top: 154px; }
     .reader .body { padding: 22px 18px 40px; }
   }
   @media (max-width: 480px) {
