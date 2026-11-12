@@ -153,7 +153,7 @@
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
   /* ---------- logos ----------
-     Logos sit straight on the widget in both themes. DSTA and the schools swap to their reverse versions in dark mode. */
+     Logos sit straight on the widget in both themes. The schools swap to their reverse versions in dark mode. */
   img[src^="images/aws/"], img[src$="react-native.png"], img[src$="react-native.webp"] { border-radius: 22%; }
   img.ink { filter: var(--ink-filter); }
 
@@ -218,12 +218,11 @@
   .rail b { display: block; font-size: 1.0625rem; line-height: 1.3; }
   .rail .what { display: block; color: var(--secondary); font-size: 0.9375rem; }
 
-  .jobs > li { display: grid; grid-template-columns: minmax(0, 1fr) 96px; column-gap: 14px; align-items: start; }
-  /* both marks sit centred in the same column, level with their entry; a square app mark is drawn larger than a
-     wordmark so the two look the same weight */
-  .jobs .org { grid-column: 2; grid-row: 1 / span 3; justify-self: center; align-self: center; width: 96px; height: 44px; object-fit: contain; object-position: center; }
-  .jobs .org.sq { width: 56px; height: 56px; border-radius: 13px; }
-  .jobs > li > :not(.org) { grid-column: 1; }
+  /* Work is typographic: the organisation is the line you read first, set in the display face; the role sits under it
+     in the label colour and the team under that */
+  .jobs .org-name { margin: 2px 0 3px; color: var(--heading); font-family: var(--display); font-size: 1.375rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; text-wrap: balance; }
+  .jobs .role { color: var(--label); font-weight: 600; }
+  .jobs .link { margin-top: 2px; color: var(--rail); }
 
   /* ---------- projects: the contribution and result stay visible; the full write-up expands below ---------- */
   .projects-head { margin-bottom: 22px; }
