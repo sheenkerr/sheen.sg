@@ -1,27 +1,28 @@
 {
-  "updatedAt": "2026-11-09T13:36+08:00",
+  "updatedAt": "2026-11-12T15:11+08:00",
   "timeZone": "Asia/Singapore",
   "firstDay": "2026-05-18",
-  "lastDay": "2026-11-09",
+  "lastDay": "2026-11-12",
   "categories": ["uncachedInput", "cacheRead", "cacheWrite", "output"],
   "tools": [{"id": "claude", "name": "Claude Code"}, {"id": "codex", "name": "Codex"}, {"id": "antigravity", "name": "Antigravity"}],
-  "totals": {"uncachedInput": 112451678, "cacheRead": 2946381835, "cacheWrite": 20724022, "output": 13778320, "total": 3093335855},
+  "totals": {"uncachedInput": 117311038, "cacheRead": 3133173627, "cacheWrite": 23598929, "output": 14848291, "total": 3288931885},
   "models": [
-    {"model": "claude-opus-5-5", "tool": "Claude Code", "uncachedInput": 12451, "cacheRead": 1322150837, "cacheWrite": 19872056, "output": 6011775, "total": 1348047119},
-    {"model": "gpt-6.1-sol", "tool": "Codex", "uncachedInput": 28125672, "cacheRead": 881415552, "cacheWrite": 0, "output": 3314402, "total": 912855626},
+    {"model": "claude-opus-5-5", "tool": "Claude Code", "uncachedInput": 13810, "cacheRead": 1379405837, "cacheWrite": 22148199, "output": 6540284, "total": 1408108130},
+    {"model": "gpt-6.1-sol", "tool": "Codex", "uncachedInput": 32972224, "cacheRead": 999219456, "cacheWrite": 0, "output": 3722644, "total": 1035914324},
     {"model": "gemini-3.8-flash", "tool": "Antigravity", "uncachedInput": 56000813, "cacheRead": 421304639, "cacheWrite": 0, "output": 2344554, "total": 479650006},
     {"model": "gemini-3.1-pro", "tool": "Antigravity", "uncachedInput": 13249965, "cacheRead": 110643852, "cacheWrite": 0, "output": 706818, "total": 124600635},
     {"model": "gpt-6-astra", "tool": "Codex", "uncachedInput": 4901762, "cacheRead": 76054912, "cacheWrite": 0, "output": 500136, "total": 81456810},
     {"model": "gpt-5.6-sol", "tool": "Codex", "uncachedInput": 1861075, "cacheRead": 48922368, "cacheWrite": 0, "output": 198698, "total": 50982141},
     {"model": "gemini-3.5-flash", "tool": "Antigravity", "uncachedInput": 2342170, "cacheRead": 38687943, "cacheWrite": 0, "output": 167414, "total": 41197527},
     {"model": "claude-opus-4-6", "tool": "Antigravity", "uncachedInput": 3222680, "cacheRead": 28691803, "cacheWrite": 0, "output": 216497, "total": 32130980},
+    {"model": "claude-fable-5-2", "tool": "Claude Code", "uncachedInput": 200, "cacheRead": 11709336, "cacheWrite": 598764, "output": 133195, "total": 12441495},
     {"model": "gemini-3.7-flash", "tool": "Antigravity", "uncachedInput": 819102, "cacheRead": 7177990, "cacheWrite": 0, "output": 62327, "total": 8059419},
     {"model": "gpt-5.5", "tool": "Codex", "uncachedInput": 474183, "cacheRead": 4935808, "cacheWrite": 0, "output": 23964, "total": 5433955},
     {"model": "claude-haiku-5-5", "tool": "Claude Code", "uncachedInput": 176, "cacheRead": 2657801, "cacheWrite": 851966, "output": 179055, "total": 3688998},
     {"model": "gpt-6-luna", "tool": "Codex", "uncachedInput": 432446, "cacheRead": 1527808, "cacheWrite": 0, "output": 31558, "total": 1991812},
     {"model": "gpt-6.1-terra", "tool": "Codex", "uncachedInput": 165312, "cacheRead": 1594240, "cacheWrite": 0, "output": 4252, "total": 1763804},
     {"model": "gemini-3.1-flash-lite", "tool": "Antigravity", "uncachedInput": 654735, "cacheRead": 12250, "cacheWrite": 0, "output": 13585, "total": 680570},
-    {"model": "gpt-5.6-luna", "tool": "Codex", "uncachedInput": 114710, "cacheRead": 383616, "cacheWrite": 0, "output": 1293, "total": 499619},
+    {"model": "gpt-5.6-luna", "tool": "Codex", "uncachedInput": 125959, "cacheRead": 407168, "cacheWrite": 0, "output": 1318, "total": 534445},
     {"model": "gpt-5.4-mini", "tool": "Codex", "uncachedInput": 41611, "cacheRead": 220416, "cacheWrite": 0, "output": 1901, "total": 263928},
     {"model": "claude-sonnet-4-6", "tool": "Antigravity", "uncachedInput": 32815, "cacheRead": 0, "cacheWrite": 0, "output": 91, "total": 32906}
   ],
@@ -201,6 +202,9 @@
     {"day": "2026-11-06", "claude": [1266, 106547460, 2509431, 824252], "codex": [1512146, 51460864, 0, 211603], "antigravity": [0, 0, 0, 0]},
     {"day": "2026-11-07", "claude": [126, 6530500, 231537, 62736], "codex": [865684, 18797440, 0, 85372], "antigravity": [0, 0, 0, 0]},
     {"day": "2026-11-08", "claude": [0, 0, 0, 0], "codex": [0, 0, 0, 0], "antigravity": [0, 0, 0, 0]},
-    {"day": "2026-11-09", "claude": [1238, 66824271, 1992286, 562525], "codex": [1502304, 42234624, 0, 151645], "antigravity": [0, 0, 0, 0]}
+    {"day": "2026-11-09", "claude": [1730, 87615613, 2802124, 773447], "codex": [3451172, 83569280, 0, 250360], "antigravity": [0, 0, 0, 0]},
+    {"day": "2026-11-10", "claude": [485, 27876952, 1098423, 229657], "codex": [1608806, 40779776, 0, 189512], "antigravity": [0, 0, 0, 0]},
+    {"day": "2026-11-11", "claude": [0, 0, 0, 0], "codex": [0, 0, 0, 0], "antigravity": [0, 0, 0, 0]},
+    {"day": "2026-11-12", "claude": [582, 20296042, 966646, 221125], "codex": [1300127, 35713024, 0, 120040], "antigravity": [0, 0, 0, 0]}
   ]
 }
