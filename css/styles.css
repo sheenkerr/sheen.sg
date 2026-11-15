@@ -47,6 +47,8 @@
     /* single-colour dark marks (Django) turn white in dark mode */
     --ink-filter: none;
     --display: "Manrope", system-ui, sans-serif;
+    /* one curve for every transition, the one the covers already draw with */
+    --ease: cubic-bezier(.3, .9, .3, 1);
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
@@ -117,6 +119,8 @@
   :focus-visible { outline: 3px solid var(--heading); outline-offset: 3px; }
   .col { max-width: 1120px; margin: 0 auto; padding: 0 40px; }
   h1, h2, h3 { font-family: var(--display); }
+  /* nothing is heavier than semibold: size and colour carry the hierarchy */
+  b, strong { font-weight: 600; }
 
   /* ---------- top bar: the name, the sections, then the ways to reach me ---------- */
   .topbar {
@@ -125,7 +129,7 @@
     backdrop-filter: blur(20px) saturate(1.6); -webkit-backdrop-filter: blur(20px) saturate(1.6);
   }
   .topbar .col { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 4px; padding-top: 10px; padding-bottom: 10px; }
-  .home { margin: 0; font-size: 1.625rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .home { margin: 0; font-size: 1.625rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
   .home a { color: var(--heading); text-decoration: none; }
   .tabs { margin: 0 auto; }
   .tabs ul { display: flex; gap: 2px; list-style: none; margin: 0; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--label) 7%, transparent); }
@@ -133,7 +137,7 @@
   .tabs a:hover { color: var(--label); }
   .tabs a[aria-current="true"] { background: var(--card); color: var(--label); box-shadow: 0 1px 4px rgba(0, 0, 0, .14); }
   .reach { display: flex; align-items: center; gap: 4px; }
-  .reach .btn { min-height: 40px; padding: 0 16px; font-size: 0.9375rem; margin-right: 6px; }
+  .reach .btn { min-height: 40px; padding: 0 16px; font-size: 0.9375rem; margin-right: 4px; }
   .icon-link { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--label); cursor: pointer; }
   .icon-link:hover { background: color-mix(in srgb, var(--label) 8%, transparent); }
   .icon-link svg { width: 22px; height: 22px; }
@@ -142,14 +146,19 @@
 
   /* lime is the main action, as on Bento; the soft button is everything else */
   .btn {
-    display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 22px; border-radius: 999px; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 0; cursor: pointer;
     background: var(--lime); color: #101418; font: 600 1rem system-ui, sans-serif; text-decoration: none;
+    transition: background-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
   }
+  .btn:hover { background: color-mix(in srgb, var(--lime) 88%, #101418); }
+  .btn:active { transform: scale(.98); }
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn:active { transform: none; } }
   .btn svg { width: 18px; height: 18px; flex: none; }
   .btn.soft { background: color-mix(in srgb, var(--label) 9%, transparent); color: var(--label); }
+  .btn.soft:hover { background: color-mix(in srgb, var(--label) 14%, transparent); }
   .btn[aria-disabled] { opacity: .55; cursor: progress; }
-  .link { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none; color: inherit; font: 600 0.9375rem system-ui, sans-serif; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: pointer; }
-  .link svg { width: 17px; height: 17px; }
+  .link { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0; border: 0; background: none; color: inherit; font: 600 0.9375rem system-ui, sans-serif; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: pointer; }
+  .link svg { width: 18px; height: 18px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
   /* ---------- logos ----------
@@ -158,19 +167,19 @@
   img.ink { filter: var(--ink-filter); }
 
   /* ---------- the home screen ---------- */
-  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 22px 0 72px; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 24px 0 72px; }
   .s2 { grid-column: span 2; } .s4 { grid-column: 1 / -1; }
   /* a widget is flat; only a widget you can press lifts, and lifts further under the pointer */
-  .w { --wbg: var(--card); background: var(--wbg); border-radius: 24px; padding: 22px; min-width: 0; }
+  .w { --wbg: var(--card); background: var(--wbg); border-radius: 24px; padding: 24px; min-width: 0; }
   .press {
     appearance: none; border: 0; margin: 0; cursor: pointer; text-align: left; color: inherit; font: inherit; width: 100%;
-    box-shadow: var(--lift); transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: var(--lift); transition: transform .18s var(--ease), box-shadow .18s var(--ease);
   }
   .press:hover { transform: translateY(-2px); box-shadow: var(--lift-hover); }
   .press:active { transform: scale(.98); }
   @media (prefers-reduced-motion: reduce) { .press { transition: none; } .press:hover, .press:active { transform: none; } }
   /* every widget title shares one style */
-  .w-title { margin: 0 0 14px; color: var(--heading); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .w-title { margin: 0 0 16px; color: var(--heading); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
 
   /* intro: me, in lime. The greeting sits beside the photo and the introduction runs the full width under them, the same
      at every width. Beside a taller Work widget the card is anchored to its top, and the token pill keeps to the foot. */
@@ -179,19 +188,14 @@
   .intro > p:not(.hi) { align-self: start; text-wrap: pretty; }
   .photo { display: block; width: 104px; height: 104px; margin: 0; border-radius: 26px; object-fit: cover; rotate: -3deg; background: var(--card); }
   .intro p { margin: 0; font-size: 1.125rem; }
-  .intro .hi { color: var(--me-ink); font-family: var(--display); font-size: clamp(2.25rem, 4.4vw, 3.25rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
-  .wave { display: inline-block; transform-origin: 70% 75%; animation: wave 1.8s ease-in-out .5s; }
-  .hi:hover .wave { animation-name: wave-again; }
-  @keyframes wave { 0%, 60%, 100% { rotate: 0deg; } 10%, 30% { rotate: 14deg; } 20% { rotate: -8deg; } 40% { rotate: -4deg; } 50% { rotate: 10deg; } }
-  @keyframes wave-again { 0%, 60%, 100% { rotate: 0deg; } 10%, 30% { rotate: 14deg; } 20% { rotate: -8deg; } 40% { rotate: -4deg; } 50% { rotate: 10deg; } }
-  @media (prefers-reduced-motion: reduce) { .wave, .hi:hover .wave { animation: none; } }
+  .intro .hi { color: var(--me-ink); font-family: var(--display); font-size: clamp(1.75rem, 3.6vw, 2.5rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; text-wrap: balance; }
   /* the last 30 days of tokens as the chart below in miniature, in the card's own ink; it takes the visitor to that chart */
   .burn {
-    display: inline-flex; align-items: center; justify-self: start; align-self: end; gap: 10px; min-height: 36px; padding: 0 14px 0 11px; border-radius: 999px;
-    background: color-mix(in srgb, var(--me-ink) 10%, transparent); color: var(--me-ink); font-size: 0.875rem; font-weight: 600; text-decoration: none; white-space: nowrap;
+    display: inline-flex; align-items: center; justify-self: start; align-self: end; gap: 8px; min-height: 36px; padding: 0 16px 0 12px; border-radius: 999px;
+    background: color-mix(in srgb, var(--me-ink) 10%, transparent); color: var(--me-ink); font-size: 0.875rem; font-weight: 400; text-decoration: none; white-space: nowrap;
   }
   .burn:is(:hover, :focus-visible) { background: color-mix(in srgb, var(--me-ink) 17%, transparent); }
-  .burn b { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .burn b { font-weight: 600; font-variant-numeric: tabular-nums; }
   /* until the figures arrive the line lies flat and faint; js/usage.js gives it the 30 days and it draws itself once,
      as the story covers do. The count never moves. Pointing at the pill draws the line again. */
   .burn-spark { display: block; flex: none; width: 72px; height: 22px; overflow: visible; }
@@ -199,13 +203,13 @@
   .spark-area { fill: currentColor; opacity: 0; }
   .spark-dot { fill: currentColor; opacity: .4; transform-box: fill-box; transform-origin: center; }
   .burn-spark.live .spark-line { opacity: 1; animation: spark-draw .9s cubic-bezier(.3, .9, .3, 1) both; }
-  .burn-spark.live .spark-area { opacity: .16; animation: spark-fill .5s ease-out .45s both; }
-  .burn-spark.live .spark-dot { opacity: 1; animation: spark-dot .4s ease-out .75s both; }
+  .burn-spark.live .spark-area { opacity: .16; animation: spark-fill .5s var(--ease) .45s both; }
+  .burn-spark.live .spark-dot { opacity: 1; animation: spark-dot .4s var(--ease) .75s both; }
   .burn:is(:hover, :focus-visible) .live .spark-line { animation-name: spark-draw-again; }
   @keyframes spark-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   @keyframes spark-draw-again { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   @keyframes spark-fill { from { opacity: 0; } to { opacity: .16; } }
-  @keyframes spark-dot { 0% { opacity: 0; transform: scale(0); } 60% { opacity: 1; transform: scale(1.5); } 100% { opacity: 1; transform: none; } }
+  @keyframes spark-dot { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { .burn-spark.live :is(.spark-line, .spark-area, .spark-dot), .burn:is(:hover, :focus-visible) .live .spark-line { animation: none; } }
 
   /* ---------- progress rails ----------
@@ -220,41 +224,41 @@
   .rail > li:not(:last-child)::before { content: ""; position: absolute; left: 5px; top: 12px; bottom: -12px; width: 2px; background: color-mix(in srgb, var(--rail) 30%, transparent); }
   .rail > li::after { content: ""; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--rail); background: var(--wbg); }
   .rail > li.current::after { background: var(--rail); }
-  .when { display: block; color: var(--rail); font-size: 0.875rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .when { display: block; color: var(--rail); font-size: 0.875rem; font-weight: 600; font-variant-numeric: tabular-nums; }
   .rail b { display: block; font-size: 1.0625rem; line-height: 1.3; }
   .rail .what { display: block; color: var(--secondary); font-size: 0.9375rem; }
 
   /* Work is typographic: the organisation is the line you read first, set in the display face; the role sits under it
      in the label colour */
-  .jobs .org-name { margin: 2px 0 3px; color: var(--heading); font-family: var(--display); font-size: 1.375rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; text-wrap: balance; }
+  .jobs .org-name { margin: 4px 0; color: var(--heading); font-family: var(--display); font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; text-wrap: balance; }
   .jobs .role { color: var(--label); font-weight: 600; }
 
   /* ---------- projects: the contribution and result stay visible; the full write-up expands below ---------- */
-  .projects-head { margin-bottom: 22px; }
+  .projects-head { margin-bottom: 24px; }
   .projects-head .w-title { margin-bottom: 8px; color: var(--proj-ink); }
-  .projects-head > p { margin: 0; color: var(--heading); font-family: var(--display); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; }
+  .projects-head > p { margin: 0; color: var(--heading); font-family: var(--display); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
   .project-features { display: grid; gap: 16px; }
   /* every project keeps the colour its cover had: the diagram panel and the small cards' icon wear it, in its ink, in both themes */
   .project-feature, .project-small { --cv: var(--pc); }
-  .project-feature { position: relative; min-width: 0; padding: 24px; border-radius: 22px; background: var(--raised); box-shadow: var(--lift); transition: transform .18s ease, box-shadow .18s ease; }
+  .project-feature { position: relative; min-width: 0; padding: 24px; border-radius: 22px; background: var(--raised); box-shadow: var(--lift); transition: transform .18s var(--ease), box-shadow .18s var(--ease); }
   .project-main { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
   .project-copy { min-width: 0; }
   .project-meta { display: block; margin: 0 0 8px; color: var(--secondary); font-size: 0.8125rem; }
-  .project-feature h3 { margin: 0; color: var(--heading); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; }
-  .project-role { margin: 8px 0 12px; color: var(--proj-ink); font-size: 0.875rem; font-weight: 700; }
+  .project-feature h3 { margin: 0; color: var(--heading); font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+  .project-role { margin: 8px 0 12px; color: var(--proj-ink); font-size: 0.875rem; font-weight: 600; }
   .project-summary { margin: 0; font-size: 0.9375rem; }
-  .project-result { margin: 14px 0 0; font-size: 0.9375rem; }
+  .project-result { margin: 12px 0 0; font-size: 0.9375rem; }
   .project-stack { display: flex; flex-wrap: wrap; gap: 8px 16px; list-style: none; margin: 16px 0 8px; padding: 0; color: var(--secondary); font-size: 0.8125rem; }
   /* each technology wears the same mark it has in the project's page, a size down */
-  .project-stack li { display: inline-flex; align-items: center; gap: 6px; }
+  .project-stack li { display: inline-flex; align-items: center; gap: 8px; }
   .project-stack img, .project-stack .glyph, .project-stack .mono { flex: none; width: 18px; height: 18px; }
   .project-stack img { object-fit: contain; }
-  .project-stack .mono { display: grid; place-items: center; width: auto; min-width: 18px; padding: 0 3px; border-radius: 4px; background: var(--b); color: var(--f); font-size: 0.5625rem; font-weight: 800; }
-  .project-repo { position: relative; z-index: 1; gap: 7px; }
+  .project-stack .mono { display: grid; place-items: center; width: auto; min-width: 18px; padding: 0 3px; border-radius: 4px; background: var(--b); color: var(--f); font-size: 0.5625rem; font-weight: 600; }
+  .project-repo { position: relative; z-index: 1; }
   .project-visual { min-width: 0; padding: 20px; border-radius: 18px; background: var(--cv); color: var(--pi); }
   .visual-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; margin-bottom: 12px; }
   .project-visual .rmark { flex: none; width: 48px; height: 48px; object-fit: contain; }
-  .visual-label { margin: 0; font-family: var(--display); font-size: 0.9375rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+  .visual-label { margin: 0; font-family: var(--display); font-size: 0.9375rem; font-weight: 600; line-height: 1.25; }
   /* the architecture diagrams: every step is the same left-aligned box, joined to the one before it by a line. A fork splits
      the line across the steps that run side by side, and the step after a fork joins them again. A filled step is the part I
      built, where only part of it was mine. */
@@ -291,7 +295,7 @@
     .fork.fit:not(:has(+ .node)) > .node:last-child::after { bottom: 50%; right: auto; }
   }
   .visual-note { margin: 12px 0 0; font-size: 0.75rem; }
-  .project-stat { margin: 0; font-family: var(--display); font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.05em; line-height: 1.1; }
+  .project-stat { margin: 0; font-family: var(--display); font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
   .stat-context { margin: 8px 0 18px; font-size: 0.875rem; }
   /* ---------- FlowFox's deploy and Virtual Vault's soak test, which js/project-motion.js plays once in view ----------
      The markup is the last frame, so with motion off they are the finished diagrams. The diagrams let clicks through to
@@ -319,7 +323,7 @@
   .pv-flow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "push push" "diff diff" "api1 fe1" "api2 fe2" "live live"; gap: 20px 12px; margin: 0; padding: 0; list-style: none; }
   .pv-node { position: relative; z-index: 1; min-width: 0; padding: 8px 11px; border: 1.5px solid transparent; border-radius: 10px; background: rgba(255, 255, 255, .6); font-size: 0.8125rem; line-height: 1.3; }
   .pv-node small { display: block; margin-bottom: 1px; color: color-mix(in srgb, currentColor 78%, transparent); font-size: 0.75rem; font-weight: 600; }
-  .pv-node b { display: block; font-weight: 700; }
+  .pv-node b { display: block; font-weight: 600; }
   .pv-node[data-n="push"] { grid-area: push; } .pv-node[data-n="diff"] { grid-area: diff; } .pv-node[data-n="live"] { grid-area: live; }
   .pv-node[data-n="api1"] { grid-area: api1; } .pv-node[data-n="api2"] { grid-area: api2; }
   .pv-node[data-n="fe1"] { grid-area: fe1; } .pv-node[data-n="fe2"] { grid-area: fe2; }
@@ -341,7 +345,7 @@
   .pv-soak .project-stat { font-size: clamp(1.75rem, 10vw - 4px, 2.75rem); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .pv-soak .stat-context { margin: 4px 0 0; font-size: 0.8125rem; line-height: 1.35; }
   .pv-chart { grid-area: chart; min-width: 0; padding-top: 12px; border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent); font-size: 0.8125rem; }
-  .pv-event { margin: 0 0 8px; padding-left: max(0px, calc(var(--at) - 7px)); font-weight: 700; line-height: 1.3; }
+  .pv-event { margin: 0 0 8px; padding-left: max(0px, calc(var(--at) - 7px)); font-weight: 600; line-height: 1.3; }
   .pv-plot { position: relative; overflow: hidden; overflow: clip; padding: 6px 0 2px; }
   .pv-track { height: 8px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in srgb, currentColor 30%, transparent) var(--at), currentColor var(--at)); }
   .pv-wedge { height: 44px; margin-top: 6px; background: color-mix(in srgb, currentColor 35%, transparent); clip-path: polygon(0 95%, 100% 0, 100% 100%, 0 100%); }
@@ -362,19 +366,19 @@
   .project-feature:has(.project-open:active) { transform: scale(.99); }
   @media (prefers-reduced-motion: reduce) { .project-feature { transition: none; } .project-feature:has(.project-open:hover), .project-feature:has(.project-open:active) { transform: none; } }
   .project-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
-  .project-open { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none; color: var(--proj-ink); font: inherit; font-size: 0.9375rem; font-weight: 700; cursor: pointer; }
+  .project-open { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none; color: var(--proj-ink); font: inherit; font-size: 0.9375rem; font-weight: 600; cursor: pointer; }
   .project-open::after { content: ""; position: absolute; inset: 0; border-radius: 22px; }
   .project-open:focus-visible { outline: none; }
   .project-open:focus-visible::after { outline: 3px solid var(--heading); outline-offset: 3px; }
-  .more-projects-h { margin: 26px 0 14px; color: var(--heading); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; }
+  .more-projects-h { margin: 28px 0 16px; color: var(--heading); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
   .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .project-small { display: flex; flex-direction: column; min-width: 0; padding: 18px; border-radius: 18px; background: var(--raised); }
-  .project-small-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; margin-bottom: 10px; }
+  .project-small { display: flex; flex-direction: column; min-width: 0; padding: 20px; border-radius: 18px; background: var(--raised); }
+  .project-small-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; margin-bottom: 12px; }
   .project-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--cv); color: var(--pi); }
   .project-icon .rmark { width: 36px; height: 36px; object-fit: contain; }
-  .project-small-title { display: block; color: var(--heading); font-family: var(--display); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.25; }
+  .project-small-title { display: block; color: var(--heading); font-family: var(--display); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
   .project-small .project-summary { margin-bottom: 16px; color: var(--secondary); }
-  .project-more { display: flex; align-items: center; gap: 8px; margin-top: auto; color: var(--proj-ink); font-size: 0.875rem; font-weight: 700; }
+  .project-more { display: flex; align-items: center; gap: 8px; margin-top: auto; color: var(--proj-ink); font-size: 0.875rem; font-weight: 600; }
   /* side by side, both columns get too narrow for a fork of three below about 900px, so the diagram goes under the copy */
   @media (max-width: 900px) { .project-main { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
   /* Side by side, the three cards share the height of the tallest, so they read as one set. Each diagram panel fills its
@@ -390,18 +394,18 @@
   @media (max-width: 700px) { .project-grid { grid-template-columns: minmax(0, 1fr); } }
   @media (pointer: coarse) { .project-repo, .project-open { min-height: 44px; } }
 
-  .edu li { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: 14px; }
+  .edu li { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: 16px; }
   .edu .crest { grid-column: 2; grid-row: 1 / span 4; justify-self: end; width: 104px; height: 48px; object-fit: contain; object-position: right center; }
   .edu li > :not(.crest) { grid-column: 1; }
-  .merit { display: block; margin-top: 2px; font-size: 0.9375rem; }
+  .merit { display: block; margin-top: 4px; font-size: 0.9375rem; }
   /* On a wide screen the rail runs across the card, newest on the left, so three short entries fill it: each school is a
      column under its dot, with its crest above its dates. Narrower, it reads down the rail with the crests on the right. */
   @media (min-width: 900px) {
     .edu .rail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; }
-    .edu .rail > li { display: block; padding: 30px 0 0; }
+    .edu .rail > li { display: block; padding: 32px 0 0; }
     .edu .rail > li:not(:last-child)::before { left: 16px; right: -24px; top: 5px; bottom: auto; width: auto; height: 2px; }
     .edu .rail > li::after { top: 0; }
-    .edu .crest { display: block; justify-self: start; width: auto; max-width: 104px; height: 44px; margin-bottom: 10px; object-position: left center; }
+    .edu .crest { display: block; justify-self: start; width: auto; max-width: 104px; height: 44px; margin-bottom: 12px; object-position: left center; }
   }
 
 
@@ -409,19 +413,20 @@
   .nested { grid-column: 1 / -1; background: var(--nested-soft); border-radius: 36px; padding: 12px; }
   .n-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 16px 16px 20px; }
   .n-head .mark { grid-row: 1 / span 2; width: 60px; height: 60px; border-radius: 14px; }
-  .n-head h2 { margin: 0; color: var(--heading); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .n-head h2 { margin: 0; color: var(--heading); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
   .n-head .role { color: var(--secondary); font-size: 0.9375rem; font-weight: 600; }
-  .n-head p { grid-column: 1 / -1; margin: 10px 0 0; text-wrap: pretty; }
+  .n-head p { grid-column: 1 / -1; margin: 12px 0 0; text-wrap: pretty; }
   /* a product named in running text carries its mark */
-  .prod { white-space: nowrap; font-weight: 700; }
+  .prod { white-space: nowrap; font-weight: 600; }
   .prod img { width: 1.25em; height: 1.25em; margin-right: 4px; vertical-align: -0.28em; object-fit: contain; }
   .n-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; grid-auto-flow: dense; }
   .n-grid > * { border-radius: 24px; }
   /* the stack opens with three stories and the guard; the rest wait behind "Show all stories" */
   .n-grid:not(.open) > .more { display: none; }
-  .n-more { display: flex; justify-content: center; padding: 14px 0 4px; }
+  .n-more { display: flex; justify-content: center; padding: 16px 0 4px; }
   .n-more .btn { background: var(--raised); color: var(--label); box-shadow: var(--lift); }
-  .n-more svg { transition: rotate .2s; }
+  .n-more .btn:hover { background: var(--raised); box-shadow: var(--lift-hover); }
+  .n-more svg { transition: rotate .2s var(--ease); }
   .n-more [aria-expanded="true"] svg { rotate: 180deg; }
   /* cards on the yellow stack keep the page's own text colours */
   .nested .story, .nested .toy { color: var(--label); }
@@ -429,7 +434,7 @@
   /* ---------- story widgets: Today's covers, in each product's own colours ---------- */
   .story { display: flex; flex-direction: column; padding: 0; overflow: hidden; background: var(--raised); }
   .story.feat { grid-column: span 2; grid-row: span 2; }
-  .cover { position: relative; flex: 1 0 auto; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px; background: var(--cv); color: var(--cv-ink); overflow: hidden; }
+  .cover { position: relative; flex: 1 0 auto; min-height: 172px; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; background: var(--cv); color: var(--cv-ink); overflow: hidden; }
   .cover.julia { --cv: var(--julia); --cv-ink: var(--julia-ink); }
   .cover.mailmail { --cv: var(--mailmail); --cv-ink: var(--mailmail-ink); }
   .cover.company { --cv: var(--company); --cv-ink: var(--company-ink); }
@@ -454,15 +459,15 @@
   .ribbon { position: absolute; top: 0; left: 0; right: 0; height: 12px; display: flex; box-shadow: 0 1px 0 color-mix(in srgb, var(--label) 16%, transparent); }
   .ribbon i { flex: 1; background: var(--b); }
   .ribbon i + i { box-shadow: -1px 0 0 color-mix(in srgb, var(--label) 16%, transparent); }
-  .kicker { position: relative; display: flex; align-items: center; flex-wrap: wrap; margin: 0 0 6px; font-size: 0.875rem; font-weight: 600; }
+  .kicker { position: relative; display: flex; align-items: center; flex-wrap: wrap; margin: 0 0 8px; font-size: 0.875rem; font-weight: 600; }
   /* the product marks say whose story it is, so they're big enough to read at a glance; bigger again on the big covers */
   .kicker .pm { width: 34px; height: 34px; margin-right: -8px; border-radius: 50%; object-fit: contain; box-shadow: 0 0 0 2px rgba(0, 0, 0, .08); }
   .kicker .pm:last-of-type { margin-right: 8px; }
   .story.feat .kicker .pm, .reader .kicker .pm { width: 40px; height: 40px; }
-  .cover h3 { position: relative; margin: 0; overflow-wrap: break-word; font-size: 1.1875rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
-  .story.feat .cover { min-height: 300px; padding: 26px; }
+  .cover h3 { position: relative; margin: 0; overflow-wrap: break-word; font-size: 1.125rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+  .story.feat .cover { min-height: 300px; padding: 24px; }
   .story.feat .cover svg.art { inset: 18px 18px auto auto; width: calc(100% - 36px); height: 44%; }
-  .story.feat .cover h3 { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.03em; max-width: 14em; }
+  .story.feat .cover h3 { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 600; letter-spacing: -0.02em; max-width: 14em; }
   /* when the featured story runs the full width, the drawing sits beside the title instead of above it,
      so the cover can be much shorter. A drawing is half again as wide as it is tall, so at 140px tall it takes
      the right 209px plus its inset, and the title stops short of that. The title steps down a size so a
@@ -478,7 +483,9 @@
     .story.feat .cover svg.art { height: 92px; }
     .story.feat .cover h3 { max-width: none; }
   }
-  .story .foot { display: grid; gap: 8px; padding: 14px 18px 16px; }
+  /* the text under a cover starts on the same line as the title above it */
+  .story .foot { display: grid; gap: 8px; padding: 16px; }
+  .story.feat .foot { padding: 16px 24px 20px; }
   .story .sum { color: var(--secondary); font-size: 0.9375rem; }
   /* the outcome reads as a sentence with a tick, so it makes sense without knowing the story */
   .outcome { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9375rem; font-weight: 600; line-height: 1.35; }
@@ -489,21 +496,21 @@
      then the guard's state, its Redis log and the buttons on the widget below. */
   .n-grid > .toy { grid-row: span 2; }
   .toy { display: flex; flex-direction: column; padding: 0; background: var(--raised); overflow: hidden; }
-  .toy .cover { padding: 22px 26px 24px; }
-  .toy .cover h3 { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.03em; }
+  .toy .cover { padding: 24px; }
+  .toy .cover h3 { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 600; letter-spacing: -0.02em; }
   .toy .lede { position: relative; margin: 8px 0 0; max-width: 30em; color: color-mix(in srgb, var(--cv-ink) 72%, transparent); font-size: 0.9375rem; }
-  .toy .foot { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; }
+  .toy .foot { display: flex; flex-direction: column; gap: 12px; padding: 16px 24px 20px; }
   /* every message is short enough for one line at the narrowest width, so the log never moves */
   .toy-state { margin: 0; overflow: hidden; font-size: 1rem; font-weight: 600; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
-  .toy-log { flex: 1 0 calc(3 * 1.6em + 24px); list-style: none; margin: 0; padding: 12px 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 14px; background: var(--term); color: #b9c3cc; font: 0.8125rem/1.6 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; }
+  .toy-log { flex: 1 0 calc(3 * 1.6em + 24px); list-style: none; margin: 0; padding: 12px 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 14px; background: var(--term); color: #b9c3cc; font: 0.8125rem/1.6 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; }
   .toy-log li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .toy-log li::before { content: "› "; color: var(--lime); }
   .toy-log li:last-child { color: #fff; }
-  .toy-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .toy-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
   .toy-actions .link { margin-left: auto; }
   /* the slots sit at the top of the cover in its ink; a paused IP strikes them through, with the time left beside them */
-  .toy-meter { position: relative; display: flex; align-items: center; gap: 10px; min-height: 30px; margin-bottom: auto; padding-bottom: 18px; }
-  .toy-meter i { flex: 0 1 64px; min-width: 24px; height: 20px; border-radius: 999px; background: color-mix(in srgb, var(--cv-ink) 14%, transparent); transition: background .2s; }
+  .toy-meter { position: relative; display: flex; align-items: center; gap: 8px; min-height: 32px; margin-bottom: auto; padding-bottom: 20px; }
+  .toy-meter i { flex: 0 1 64px; min-width: 24px; height: 20px; border-radius: 999px; background: color-mix(in srgb, var(--cv-ink) 14%, transparent); transition: background .2s var(--ease); }
   .toy-meter i.on { background: var(--cv-ink); }
   .toy-blocked .toy-meter i { background: repeating-linear-gradient(-45deg, var(--cv-ink) 0 5px, color-mix(in srgb, var(--cv-ink) 14%, transparent) 5px 10px); }
   .toy-ttl { flex: none; min-width: calc(8ch + 24px); height: 24px; margin-left: auto; padding: 0 12px; border-radius: 999px; background: var(--cv-ink); color: #fff; font: 600 0.875rem/24px ui-monospace, Consolas, monospace; font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
@@ -524,33 +531,32 @@
   /* ---------- token usage: figures from data/usage.json ----------
      A plain widget; the only colour is the chart's, orange for Claude Code and the text colour for Codex, and every mark in that
      colour has its tool's name beside it. Numbers you compare down a column line up; the big ones keep their own widths. */
-  .usage-figures { display: grid; grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .usage-figures { display: grid; grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
   /* each figure picks its token type for the chart; the picked one wears a ring */
   .usage-total, .usage-tile {
-    display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 14px 16px; border: 0; border-radius: 18px;
-    background: var(--bg); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: box-shadow .15s;
+    display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 16px; border: 0; border-radius: 18px;
+    background: var(--bg); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: box-shadow .15s var(--ease);
   }
   :is(.usage-total, .usage-tile):hover { background: color-mix(in srgb, var(--label) 6%, var(--bg)); }
   :is(.usage-total, .usage-tile)[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--heading); }
   @media (prefers-reduced-motion: reduce) { .usage-total, .usage-tile { transition: none; } }
   .usage-label { color: var(--secondary); font-size: 0.8125rem; font-weight: 600; }
-  .usage-figures b { color: var(--heading); font-family: var(--display); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
-  .usage-total b { font-size: clamp(2.25rem, 4.4vw, 3rem); letter-spacing: -0.04em; line-height: 1.05; }
+  .usage-figures b { color: var(--heading); font-family: var(--display); font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+  .usage-total b { font-size: clamp(2.25rem, 4.4vw, 3rem); letter-spacing: -0.03em; line-height: 1.05; }
   .usage-note { color: var(--secondary); font-size: 0.8125rem; }
-  /* the figures show their proportions as well as say them. The big figure is split by tool in the chart's colours, and
-     a tool picked in the legend leaves the others faint; each kind of token has a meter of its share of all tokens. */
+  /* The big figure is split by tool in the chart's colours, and a tool picked in the legend leaves the others faint.
+     Each kind of token says its share in words, so the meter js/usage.js draws under it stays hidden: a tile is a
+     label, a figure and its share. */
   .usage-split { align-self: stretch; flex: none; display: flex; gap: 2px; height: 8px; margin-top: auto; border-radius: 4px; overflow: hidden; }
   .usage-total .usage-note { margin-bottom: 12px; }
-  .usage-split i { flex: 1 1 0; min-width: 4px; background: var(--k); transition: opacity .15s; }
+  .usage-split i { flex: 1 1 0; min-width: 4px; background: var(--k); transition: opacity .15s var(--ease); }
   .usage-split i.off { opacity: .22; }
   .usage-split .claude { --k: var(--claude); } .usage-split .codex { --k: var(--codex); } .usage-split .antigravity { --k: var(--antigravity); }
-  .usage-meter { align-self: stretch; flex: none; height: 4px; margin-top: auto; border-radius: 2px; background: color-mix(in srgb, var(--label) 11%, transparent); }
-  .usage-meter i { display: block; min-width: 4px; height: 100%; border-radius: 2px; background: var(--secondary); }
-  .usage-tile .usage-note { margin-bottom: 10px; }
+  .usage-meter { display: none; }
   @media (prefers-reduced-motion: reduce) { .usage-split i { transition: none; } }
-  .usage-chart { padding: 16px 16px 6px; border-radius: 18px; background: var(--bg); margin-bottom: 22px; }
-  .usage-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
-  .usage-h3 { margin: 0; color: var(--heading); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; }
+  .usage-chart { padding: 16px 16px 8px; border-radius: 18px; background: var(--bg); margin-bottom: 12px; }
+  .usage-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+  .usage-h3 { margin: 0; color: var(--heading); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
   .usage-controls { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; max-width: 100%; }
   /* the same pill switch as the section tabs, a size down */
   .seg { display: flex; gap: 2px; max-width: 100%; overflow-x: auto; scrollbar-width: none; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--label) 7%, transparent); }
@@ -558,13 +564,13 @@
   .seg button:hover { color: var(--label); }
   .seg button[aria-checked="true"] { background: var(--card); color: var(--label); box-shadow: 0 1px 4px rgba(0, 0, 0, .14); }
   .seg button:focus-visible { outline-offset: -1px; }
-  .usage-legend { display: flex; flex-wrap: wrap; gap: 0 18px; list-style: none; margin: 6px 0 0; padding: 0; font-size: 0.875rem; }
+  .usage-legend { display: flex; flex-wrap: wrap; gap: 0 16px; list-style: none; margin: 8px 0 0; padding: 0; font-size: 0.875rem; }
   .usage-legend li, .usage-models td:nth-child(2) { white-space: nowrap; }
-  .key { display: inline-block; width: 10px; height: 10px; margin-right: 7px; border-radius: 3px; background: var(--k, var(--secondary)); }
-  .tool-logo { flex: none; width: 14px; height: 14px; margin-right: 7px; object-fit: contain; vertical-align: -2px; }
+  .key { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 3px; background: var(--k, var(--secondary)); }
+  .tool-logo { flex: none; width: 14px; height: 14px; margin-right: 8px; object-fit: contain; vertical-align: -2px; }
   .usage-legend li { display: inline-flex; align-items: center; }
   /* each tool shows only itself when pressed; the others fade back while one is picked */
-  .usage-legend button { display: inline-flex; align-items: center; min-height: 32px; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; transition: opacity .15s; }
+  .usage-legend button { display: inline-flex; align-items: center; min-height: 32px; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; transition: opacity .15s var(--ease); }
   .usage-legend button:hover { text-decoration: underline; text-underline-offset: 4px; }
   .usage-legend:has([aria-pressed="true"]) [aria-pressed="false"] { opacity: .45; }
   @media (prefers-reduced-motion: reduce) { .usage-legend button { transition: none; } }
@@ -586,7 +592,7 @@
   .area.codex, .curve.codex { --k: var(--codex); }
   .area.antigravity, .curve.antigravity { --k: var(--antigravity); }
   .usage-tip {
-    position: absolute; z-index: 2; min-width: 144px; max-width: 100%; padding: 8px 10px; border: 1px solid var(--glass-edge); border-radius: 12px;
+    position: absolute; z-index: 2; min-width: 144px; max-width: 100%; padding: 8px 12px; border: 1px solid var(--glass-edge); border-radius: 12px;
     background: var(--glass); backdrop-filter: blur(20px) saturate(1.6); -webkit-backdrop-filter: blur(20px) saturate(1.6);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1); font-size: 0.75rem; line-height: 1.35; white-space: nowrap; pointer-events: none;
   }
@@ -600,34 +606,34 @@
      turns over once it's open */
   .usage-fold summary { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--label); font-size: 0.875rem; font-weight: 600; cursor: pointer; list-style: none; }
   .usage-fold summary::-webkit-details-marker { display: none; }
-  .usage-fold summary::after { content: ""; flex: none; width: 7px; height: 7px; margin: 0 4px 0 auto; border: solid currentColor; border-width: 0 2px 2px 0; translate: 0 -2px; rotate: 45deg; transition: rotate .2s, translate .2s; }
+  .usage-fold summary::after { content: ""; flex: none; width: 7px; height: 7px; margin: 0 4px 0 auto; border: solid currentColor; border-width: 0 2px 2px 0; translate: 0 -2px; rotate: 45deg; transition: rotate .2s var(--ease), translate .2s var(--ease); }
   .usage-fold[open] summary::after { translate: 0 2px; rotate: 225deg; }
   @media (prefers-reduced-motion: reduce) { .usage-fold summary::after { transition: none; } }
   .usage-count { color: var(--secondary); font-size: 0.8125rem; font-weight: 400; letter-spacing: 0; }
   .usage-fold summary:hover .usage-count { color: var(--label); }
   /* the daily figures close off the chart's card, under a rule */
-  .usage-days { margin-top: 10px; border-top: 1px solid var(--sep); }
-  .usage-days .usage-scroll { max-height: 320px; overflow-y: auto; margin-bottom: 10px; }
+  .usage-days { margin-top: 12px; border-top: 1px solid var(--sep); }
+  .usage-days .usage-scroll { max-height: 320px; overflow-y: auto; margin-bottom: 12px; }
   /* the model table is a card of its own beside the chart's, its row set like the chart's heading */
   .usage-by-model { border-radius: 18px; background: var(--bg); }
-  .usage-by-model summary { min-height: 56px; padding: 0 16px; border-radius: 18px; color: var(--heading); font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em; }
+  .usage-by-model summary { min-height: 56px; padding: 0 16px; border-radius: 18px; color: var(--heading); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
   .usage-by-model summary:hover { background: color-mix(in srgb, var(--label) 6%, var(--bg)); }
   .usage-by-model[open] summary { border-radius: 18px 18px 0 0; }
   /* about eight models show at once; the column names and the all-models total stay put while the rest scroll */
-  .usage-by-model .usage-scroll { max-height: 360px; overflow-y: auto; padding: 0 16px; margin-bottom: 6px; }
+  .usage-by-model .usage-scroll { max-height: 360px; overflow-y: auto; padding: 0 16px; margin-bottom: 8px; }
   .usage-by-model :is(thead, tfoot) :is(th, td) { position: sticky; background: var(--bg); }
   .usage-by-model thead th { top: 0; z-index: 1; border-bottom: 0; box-shadow: inset 0 -1px var(--sep); }
   .usage-by-model tfoot :is(th, td) { bottom: 0; box-shadow: inset 0 1px var(--sep); }
   .usage-scroll { overflow-x: auto; }
   .usage-scroll table { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
-  .usage-scroll th, .usage-scroll td { padding: 8px 10px; border-bottom: 1px solid var(--sep); text-align: right; white-space: nowrap; }
+  .usage-scroll th, .usage-scroll td { padding: 8px 12px; border-bottom: 1px solid var(--sep); text-align: right; white-space: nowrap; }
   .usage-scroll :is(th, td):first-child { padding-left: 0; text-align: left; }
   .usage-scroll :is(th, td):last-child { padding-right: 0; }
   .usage-scroll thead th { color: var(--secondary); font-size: 0.8125rem; font-weight: 600; }
   .usage-scroll tbody th { font-weight: 600; }
   .usage-models :is(th, td):nth-child(2) { text-align: left; color: var(--secondary); }
-  .usage-models tfoot :is(th, td) { border-bottom: 0; font-weight: 700; }
-  .usage-models td:last-child { font-weight: 700; }
+  .usage-models tfoot :is(th, td) { border-bottom: 0; font-weight: 600; }
+  .usage-models td:last-child { font-weight: 600; }
   .usage-empty { margin: 0; color: var(--secondary); }
   @media (max-width: 1023px) {
     .usage-figures { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -636,25 +642,25 @@
   @media (max-width: 560px) {
     .usage-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .usage-figures b { font-size: 1.5rem; }
-    .usage-chart { padding: 14px 12px 4px; }
+    .usage-chart { padding: 12px 12px 4px; }
   }
 
   /* ---------- contact ---------- */
   /* the page closes on me, as it opens: a soft lime in light mode; in dark mode a plain card with a lime title, like Hi */
   .contact { --wbg: var(--close); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
   .contact .w-title { margin: 0; color: var(--close-ink); }
-  .contact .links { display: flex; align-items: center; gap: 8px 22px; flex-wrap: wrap; }
+  .contact .links { display: flex; align-items: center; gap: 8px 24px; flex-wrap: wrap; }
   .contact .btn { box-shadow: var(--lift); }
   /* LinkedIn and GitHub stay together, so on a narrow screen they wrap as a pair under the CV button */
-  .contact .profiles { display: flex; gap: 8px 22px; }
+  .contact .profiles { display: flex; gap: 8px 24px; }
 
   /* technology chips shared by project write-ups and the story reader */
   .chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 8px 0 0; padding: 0; }
-  .chips li { display: inline-flex; align-items: center; gap: 7px; background: var(--bg); border-radius: 999px; padding: 4px 12px; font-size: 0.9375rem; }
-  .chips li:has(img, .mono, .glyph) { padding-left: 5px; }
+  .chips li { display: inline-flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 999px; padding: 4px 12px; font-size: 0.9375rem; }
+  .chips li:has(img, .mono, .glyph) { padding-left: 4px; }
   .chips img, .chips .mono, .chips .glyph { flex: none; width: 24px; height: 24px; }
   .chips img { object-fit: contain; }
-  .chips .mono { display: grid; place-items: center; width: auto; min-width: 24px; padding: 0 4px; border-radius: 6px; background: var(--b); color: var(--f); font-size: 0.625rem; font-weight: 800; }
+  .chips .mono { display: grid; place-items: center; width: auto; min-width: 24px; padding: 0 4px; border-radius: 6px; background: var(--b); color: var(--f); font-size: 0.625rem; font-weight: 600; }
 
   /* ---------- story view: the widget's cover grows into the page ---------- */
   dialog.reader {
@@ -665,34 +671,35 @@
   dialog.reader::backdrop { background: rgba(0, 0, 0, .45); }
   .reader .cover { min-height: 360px; padding: 28px; }
   .reader .cover svg.art { inset: 28px 28px auto auto; width: calc(100% - 56px); height: 40%; }
-  .reader .cover h3 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; letter-spacing: -0.03em; max-width: 16em; }
+  .reader .cover h3 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 600; letter-spacing: -0.02em; max-width: 16em; }
   /* A featured project's page opens on the card's own diagram panel, in the cover's colour, so the two look the same and
      the card's panel grows into it. The cover then only holds the panel and the title under it. Its header keeps clear
      of the close button, and the steps stay at a readable width on a wide page. */
   .reader .cover.has-visual { justify-content: flex-start; min-height: 0; }
   .reader .cover > .project-visual { margin: -20px -20px 16px; }
-  .reader .cover > .project-visual .visual-head { padding-right: 40px; }
+  .reader .cover > .project-visual .visual-head { padding-right: 44px; }
   .reader .cover > .project-visual .rmark { position: static; width: 48px; height: 48px; }
   .reader .cover > .project-visual > :not(.visual-head) { max-width: 600px; }
   .reader .close {
-    position: sticky; top: 14px; float: right; margin: 14px 14px -58px 0; z-index: 3;
+    position: sticky; top: 16px; float: right; margin: 16px 16px -60px 0; z-index: 3;
     width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center;
     background: rgba(0, 0, 0, .4); color: #fff; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
   @media (prefers-reduced-transparency: reduce) { .reader .close { background: #000; } }
-  .reader .body { padding: 26px 26px 40px; max-width: 660px; }
-  .reader .r-mod { margin: 0 0 6px; color: var(--secondary); font-size: 0.9375rem; font-weight: 600; }
+  /* the body starts on the same line as the cover's title, 28px in */
+  .reader .body { padding: 24px 28px 40px; max-width: 660px; }
+  .reader .r-mod { margin: 0 0 8px; color: var(--secondary); font-size: 0.9375rem; font-weight: 600; }
   .reader .lead { font-size: 1.25rem; line-height: 1.45; margin: 0 0 24px; }
-  .reader h4 { margin: 26px 0 8px; font-family: var(--display); font-size: 1.0625rem; font-weight: 700; }
+  .reader h4 { margin: 24px 0 8px; font-family: var(--display); font-size: 1.0625rem; font-weight: 600; }
   .reader p { margin: 0 0 12px; }
-  .reader ul:not(.chips) { margin: 0 0 12px; padding-left: 22px; }
+  .reader ul:not(.chips) { margin: 0 0 12px; padding-left: 24px; }
   .reader ul:not(.chips) li { margin-bottom: 8px; }
   /* the result is the win, so it wears lime */
-  .reader .result { background: color-mix(in srgb, var(--lime) 55%, var(--card)); border-radius: 16px; padding: 16px 18px; font-weight: 600; }
-  .reader .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .reader .result { background: color-mix(in srgb, var(--lime) 55%, var(--card)); border-radius: 16px; padding: 16px 20px; font-weight: 600; }
+  .reader .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
   /* previous on the left, next on the right; each keeps its side when it's the only one */
   .reader .pn { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 32px; }
-  .reader .pn button { display: block; width: 100%; text-align: left; border: 0; cursor: pointer; padding: 18px 20px; border-radius: 18px; background: var(--bg); color: var(--label); font: inherit; }
+  .reader .pn button { display: block; width: 100%; text-align: left; border: 0; cursor: pointer; padding: 16px 20px; border-radius: 18px; background: var(--bg); color: var(--label); font: inherit; }
   .reader .pn .next { grid-column: 2; text-align: right; }
   .reader .pn span { display: flex; align-items: center; gap: 4px; color: var(--secondary); font-size: 0.875rem; }
   .reader .pn .next span { justify-content: flex-end; }
@@ -702,7 +709,7 @@
   @media (min-width: 1024px) {
     dialog.reader { width: min(920px, calc(100vw - 96px)); }
     .reader .cover { min-height: 420px; }
-    .reader .body { padding: 34px 40px 48px; max-width: 720px; }
+    .reader .body { padding: 32px 28px 48px; max-width: 720px; }
   }
   ::view-transition-group(story-cover) { animation-duration: .42s; animation-timing-function: cubic-bezier(.3, .9, .3, 1); }
 
@@ -723,7 +730,7 @@
     .topbar .col { column-gap: 12px; }
     .theme { order: 2; }
     .icon-link { width: 40px; height: 40px; }
-    .reach .btn { padding: 0 14px; margin-right: 2px; }
+    .reach .btn { padding: 0 12px; margin-right: 0; }
     .reach { margin-left: auto; }
     .tabs { order: 1; flex: 1 1 calc(100% - 56px); margin: 0; }
     .tabs ul { flex: 1; }
@@ -736,23 +743,25 @@
   }
   @media (max-width: 560px) {
     .col { padding: 0 16px; }
-    .grid { gap: 14px; }
+    .grid { gap: 12px; }
     .w { padding: 20px; }
-    .intro { gap: 14px 16px; }
+    .intro { gap: 12px 16px; }
     .photo { width: 84px; height: 84px; border-radius: 22px; }
     .nested { padding: 8px; border-radius: 32px; }
-    .n-head { padding: 14px 12px 16px; }
+    .n-head { padding: 12px 12px 16px; }
     .n-head .mark { width: 48px; height: 48px; border-radius: 12px; }
     .n-grid { grid-template-columns: minmax(0, 1fr); }
     .n-grid .s2 { grid-column: auto; }
-    .project-feature { padding: 18px; }
+    .project-feature { padding: 16px; }
+    .story.feat .cover, .toy .cover, .story.feat .foot, .toy .foot { padding-inline: 20px; }
     .project-visual { padding: 16px; }
-    .reader .cover { min-height: 280px; }
-    .reader .cover > .project-visual { margin: -16px -16px 12px; }
+    .reader .cover { min-height: 280px; padding-inline: 20px; }
+    .reader .cover > .project-visual { margin: -16px -12px 12px; }
+    .reader .cover > .project-visual .visual-head { padding-right: 48px; }
     /* a drawing keeps a fixed 112px, and the cover keeps that room above a title of any length, as for a diagram */
     .reader .cover svg.art { height: 112px; }
     .reader .cover:has(> svg.art) { padding-top: 154px; }
-    .reader .body { padding: 22px 18px 40px; }
+    .reader .body { padding: 24px 20px 40px; }
   }
   @media (max-width: 480px) {
     .home { font-size: 1.375rem; }

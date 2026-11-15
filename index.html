@@ -93,7 +93,7 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
   <main class="grid">
     <section class="w intro s2" aria-label="Introduction">
       <img class="photo" src="images/me/headshot.jpg" width="320" height="320" alt="Photo of Sheen">
-      <p class="hi">Hi <span class="wave" role="img" aria-label="waving hand">👋</span></p>
+      <p class="hi">Hi, I’m Sheen</p>
       <p>Software engineer at DSTA in Singapore and an NUS Computer Science graduate. I build backend services, their data models and their deployment.</p>
       <a class="burn" id="burn" href="#tokens" title="Tokens used in the last 30 days. See them by day."><svg class="burn-spark" id="burnSpark" viewBox="0 0 72 22" aria-hidden="true"><path class="spark-area" d=""/><path class="spark-line" pathLength="1" d="M2 19H68"/><circle class="spark-dot" cx="68" cy="19" r="2.2"/></svg><span id="burnText">Tokens used in 30 days</span></a>
     </section>
@@ -119,19 +119,19 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
         <img class="mark" src="images/orgs/nested.svg" alt="">
         <h2 id="stories-h">Stories from Nested Technologies</h2>
         <span class="role">Software Engineer Intern, Jan – Jul 2026</span>
-        <p>A small startup with three products: <span class="prod">Julia</span>, an AI quotation tool; <span class="prod">Mailmail</span>, an email campaign service; and <span class="prod">Autoscrape</span>, a contact-finding tool. Most of my work was on Julia, with some on Mailmail. Here are some notable examples; pick one to read it.</p>
+        <p>A small startup with three products: <span class="prod">Julia</span>, an AI quotation tool; <span class="prod">Mailmail</span>, an email campaign service; and <span class="prod">Autoscrape</span>, a contact-finding tool. Most of my work was on Julia, with some on Mailmail. Pick a story to read it.</p>
       </div>
       <div class="n-grid" id="storyList"></div>
-      <div class="n-more"><button class="btn" type="button" id="moreStories" aria-expanded="false" aria-controls="storyList"><span>Show all stories</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="n-more"><button class="btn" type="button" id="moreStories" aria-expanded="false" aria-controls="storyList"><span>Show all stories</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     </section>
 
     <section class="w projects s4" id="projects" aria-labelledby="proj-h">
       <div class="projects-head">
         <h2 id="proj-h" class="w-title">Projects</h2>
-        <p>What I’ve built, shipped and tested.</p>
+        <p>What I’ve built, shipped and tested</p>
       </div>
       <div class="project-features" id="projectFeatures"></div>
-      <h3 class="more-projects-h" id="more-projects-h">More Projects</h3>
+      <h3 class="more-projects-h" id="more-projects-h">More projects</h3>
       <div class="project-grid" id="projectGrid" role="group" aria-labelledby="more-projects-h"></div>
     </section>
 
@@ -159,7 +159,7 @@ try { const t = localStorage.getItem('theme'); if (t) document.documentElement.d
         <div class="usage-x" id="usageX" aria-hidden="true"></div>
         <details class="usage-fold usage-days"><summary>Daily figures <span class="usage-count" id="usageDaysCount"></span></summary><div class="usage-scroll" id="usageDays"></div></details>
       </div>
-      <details class="usage-fold usage-by-model"><summary>By Model <span class="usage-count" id="usageModelsCount"></span></summary><div class="usage-scroll" id="usageModels" role="region" aria-label="Tokens by model" tabindex="0"></div></details>
+      <details class="usage-fold usage-by-model"><summary>By model <span class="usage-count" id="usageModelsCount"></span></summary><div class="usage-scroll" id="usageModels" role="region" aria-label="Tokens by model" tabindex="0"></div></details>
     </section>
 
     <section class="w contact s4" aria-labelledby="c-h">

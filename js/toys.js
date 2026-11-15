@@ -16,7 +16,7 @@ window.TOYS = (() => {
     const ip = 'demo-visitor', LIMIT = 3, DAY = 86400;
     root.innerHTML = `
       <div class="toy-meter" aria-hidden="true">${'<i></i>'.repeat(LIMIT)}<b class="toy-ttl" hidden></b></div>
-      <p class="toy-state" aria-live="polite">No sign-ups yet today.</p>
+      <p class="toy-state" aria-live="polite">No sign-ups yet today</p>
       <ol class="toy-log" aria-hidden="true"><li>redis-cli, key signup:${ip}</li></ol>
       <div class="toy-actions"><button type="button" class="toy-go">Sign up</button><button type="button" class="toy-reset" hidden>Skip a day</button></div>`;
     const $ = s => root.querySelector(s), log = logger($('.toy-log')), slots = root.querySelectorAll('.toy-meter i');
@@ -25,7 +25,7 @@ window.TOYS = (() => {
     $('.toy-go').addEventListener('click', () => {
       if (blockedAt) {
         log(`EXISTS block:${ip} → 1`); log(`429, try again in ${$('.toy-ttl').textContent}`);
-        $('.toy-state').textContent = `Still paused for this visitor.`;
+        $('.toy-state').textContent = `Still paused for this visitor`;
         root.classList.remove('toy-bump'); void root.offsetWidth; root.classList.add('toy-bump');
         return;
       }
@@ -34,7 +34,7 @@ window.TOYS = (() => {
       if (n <= LIMIT) {
         slots[n - 1].classList.add('on');
         log(`201 Created, account #${1040 + n}`);
-        $('.toy-state').textContent = `${n} of ${LIMIT} sign-ups used today.`;
+        $('.toy-state').textContent = `${n} of ${LIMIT} sign-ups used today`;
         if (n === LIMIT) $('.toy-go').textContent = 'Sign up again';
         return;
       }
@@ -42,7 +42,7 @@ window.TOYS = (() => {
       blockedAt = Date.now(); ttl(); timer = setInterval(ttl, 1000);
       root.classList.add('toy-blocked'); $('.toy-ttl').hidden = false; $('.toy-reset').hidden = false;
       $('.toy-go').textContent = 'Try again';
-      $('.toy-state').textContent = `Sign-up ${n}: paused for a day.`;
+      $('.toy-state').textContent = `Sign-up ${n}: paused for a day`;
     });
     $('.toy-reset').addEventListener('click', () => {
       clearInterval(timer); n = 0; blockedAt = 0;
@@ -50,7 +50,7 @@ window.TOYS = (() => {
       root.classList.remove('toy-blocked'); $('.toy-ttl').hidden = true; $('.toy-reset').hidden = true;
       $('.toy-go').textContent = 'Sign up'; $('.toy-go').focus();
       log('24 hours later, both keys expired');
-      $('.toy-state').textContent = `A day later, sign-ups are open.`;
+      $('.toy-state').textContent = `A day later, sign-ups are open`;
     });
   }
 

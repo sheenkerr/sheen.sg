@@ -229,9 +229,9 @@ const projectVisuals = {
       <div class="pv-stat"><p class="project-stat"><span class="pv-clock" aria-hidden="true">14h 00m</span><span class="sr">14 hours</span></p>
         <p class="stat-context">100 simulated shoppers<br>Almost 2 million requests</p></div>
       <div class="pv-chart">
-        <p class="pv-event">Order history starts timing out at 4½ h</p>
+        <p class="pv-event">Order history starts timing out at 4½h</p>
         <div class="pv-plot" aria-hidden="true"><div class="pv-track"></div><div class="pv-wedge"></div><i class="pv-sweep"></i><i class="pv-mark"></i><i class="pv-drop"></i></div>
-        <div class="pv-scale"><span><b>0 h</b>0.1 GB</span><span>Backend memory<b class="pv-gb" aria-hidden="true">2.1 GB</b></span><span><b>14 h</b>2.1 GB</span></div>
+        <div class="pv-scale"><span><b>0h</b>0.1 GB</span><span>Backend memory<b class="pv-gb" aria-hidden="true">2.1 GB</b></span><span><b>14h</b>2.1 GB</span></div>
       </div>
       <p class="pv-note">Memory climbed the whole run and never settled back. Only its start and end were measured, so the line between them is straight. Amber shows when timeouts began, not how many shoppers they hit.</p>
     </div>
@@ -292,7 +292,7 @@ function fill(x) {
   track(`${noun}/${x.id}`, x.title);
   stopMotion();
   reader.innerHTML = `
-    <button class="close" type="button" aria-label="Close story"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+    <button class="close" type="button" aria-label="Close story"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     ${cover(x, x.kicker, x.group === 'proj' && projectVisuals[x.id]).replace('<h3>', '<h3 id="r-title">')}
     <div class="body">
       ${x.module ? `<p class="r-mod">${esc(x.module)}</p>` : ''}<p class="lead">${esc(x.summary)}</p>

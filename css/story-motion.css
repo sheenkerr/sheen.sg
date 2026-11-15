@@ -8,7 +8,7 @@
   .sm-art {
     --sm-h: 26px; --sm-corner: 30px;
     position: absolute; container: sm / size; pointer-events: none;
-    color: inherit; font: 700 0.75rem/1.15 var(--display, "Manrope", system-ui, sans-serif); letter-spacing: -0.01em;
+    color: inherit; font: 600 0.75rem/1.15 var(--display, "Manrope", system-ui, sans-serif); letter-spacing: 0;
   }
   .sm-in { position: relative; width: 100%; height: 100%; }
   /* A small card keeps its drawing to the top, in the room the cover already leaves above its title. Every region is
@@ -18,7 +18,7 @@
      the title however that wraps. With no basis of its own it adds nothing to the cover's height. */
   .story.feat .cover > .sm-art {
     position: relative; top: auto; right: auto; flex: 1 1 0; width: auto; height: auto; min-height: 0; max-height: 180px;
-    margin: -8px -8px auto; padding-bottom: 14px;
+    margin: -6px -6px auto; padding-bottom: 14px;
   }
   /* beside the title on a tablet, the drawing keeps to the 206px the title leaves it; above it again on a phone */
   @media (max-width: 1023px) {
@@ -44,7 +44,7 @@
     background: rgba(255, 255, 255, calc(var(--on) * .62));
   }
   .sm-n.is-on { --lp: 100%; }
-  .sm-n b { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+  .sm-n b { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
   .sm-n small { display: none; font-size: 0.6875rem; font-weight: 600; opacity: .82; }
   @container sm (min-height: 104px) and (min-width: 360px) { .sm-n small { display: block; } .sm-n { padding: 4px 10px; } }
   .sm-ic { flex: none; width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -158,7 +158,7 @@
   .sm-replay {
     position: relative; z-index: 1; justify-self: end; align-self: start; margin: 6px;
     background: rgba(255, 255, 255, .7); color: inherit;
-    transition: translate .18s ease, background .18s ease;
+    transition: translate .18s var(--ease, ease), background .18s var(--ease, ease);
   }
   .sm-replay:hover { background: rgba(255, 255, 255, .92); }
   /* it rides along when the card under it lifts */
